@@ -30,6 +30,7 @@ ERC-\<TBA\> rectify those weaknesses and is available under the more permissive 
 ### Token Contract
 #### Methods
 ##### name
+
 ``` ts
  function name() constant returns (string name)
 ```
@@ -41,7 +42,9 @@ Returns the name of the token - e.g. `"MyToken"`.
 > **returns** `name`: Name of the token
 
 <br/>
+
 ##### symbol
+
 ``` ts
 function symbol() constant returns (string symbol)
 ```
@@ -52,7 +55,9 @@ Returns the symbol of the token. E.g.  `"MYT"`.
 > **returns** `symbol`: Symbol of the token
 
 <br/>
+
 ##### decimals
+
 ``` ts
 function decimals() constant returns (uint8 decimals)
 ```
@@ -63,7 +68,9 @@ Returns the number of decimals the token uses - e.g. `8`, means to divide the to
 > **returns** `decimals`: Number of decimals used by the token.
 
 <br/>
+
 ##### totalSupply
+
 ``` ts
 function totalSupply() constant returns (uint256 totalSupply)
 ```
@@ -72,7 +79,9 @@ Get the total token supply.
 > **returns** `totalSupply`: Total supply of tokens currently in circulation.
 
 <br/>
+
 ##### balanceOf
+
 ``` ts
 function balanceOf(address _owner) constant returns (uint256 balance)
 ```
@@ -83,7 +92,9 @@ Get the account balance of another account with address `_owner`.
 > **returns** `balance`: Amount of token held by `_owner` in the token-contract.
 
 <br/>
+
 ##### transfer
+
 ``` ts
 function transfer(address _to, uint256 _value) returns (bool success)
 ```
@@ -99,7 +110,9 @@ A token contract which creates new tokens SHOULD trigger a `Transfer` event with
 > - `_value`: amount of tokens transferred
 
 <br/>
+
 ##### transferTo
+
 ``` ts
 function transferTo(address _to, uint256 _value, bytes _data) returns (bool success)
 ```
@@ -119,7 +132,9 @@ A token contract which creates new tokens SHOULD trigger a `TransferTo` event wi
 > - `_data`: information attached to the transaction
 
 <br/>
+
 ##### ~~approve~~ *(deprecated)*
+
 ``` ts
 function approve(address _spender, uint256 _value) returns (bool success)
 ```
@@ -134,7 +149,9 @@ Allows `_spender` to withdraw from your account multiple times, up to the `_valu
 > - `_value`: maximum amount which is allowed to be withdrawn
 
 <br/>
+
 ##### ~~transferFrom~~ *(deprecated)*
+
 ``` ts
 function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
 ```
@@ -154,8 +171,10 @@ The `transferFrom` method is used for a withdraw workflow, allowing contracts to
 > - `_value`: amount of tokens to transfer
 
 <br/>
+
 #### Events
 ##### Transfer
+
 ``` ts
 event Transfer(address indexed _from, address indexed _to, uint256 indexed _value)
 ```
@@ -170,7 +189,9 @@ Triggered when tokens are transferred using the `transfer` or `transferTo` metho
 > - `_data`: information attached to the transaction
 
 <br/>
+
 ##### ~~Approval~~ *(deprecated)*
+
 ``` ts
 event Approval(address indexed _owner, address indexed _spender, uint256 _value)
 ```
@@ -186,9 +207,11 @@ MUST trigger on any successful call to `approve(address _spender, uint256 _value
 > - `_value`: maximum amount which is allowed to be withdrawn
 
 <br/>
-#### Contracts Interacting With ERC-\<TBA\> Tokens:
-##### Methods
+
+### Contracts Interacting With ERC-\<TBA\> Tokens:
+#### Methods
 ##### tokenFallback
+
 ``` ts
 function tokenFallback(address _from, uint _value, bytes _data)
 ```
