@@ -39,6 +39,10 @@ Returns the name of the token - e.g. `"MyToken"`.
 
 *Optional*: This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
 
+*Note*: This method SHOULD NOT be implemented explicitly. Instead declare a
+public state variable: `string public name` and let the solidity compiler create
+the getter.
+
 > **returns** `name`: Name of the token
 
 <br/>
@@ -52,6 +56,10 @@ Returns the symbol of the token. E.g.  `"MYT"`.
 
 *Optional*: This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
 
+*Note*: This method SHOULD NOT be implemented explicitly. Instead declare a
+public state variable: `string public symbol` and let the solidity compiler
+create the getter.
+
 > **returns** `symbol`: Symbol of the token
 
 <br/>
@@ -64,6 +72,10 @@ function decimals() constant returns (uint8 decimals)
 Returns the number of decimals the token uses - e.g. `8`, means to divide the token amount by `100000000` to get its user representation.
 
 *Optional*: This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
+
+*Note*: This method SHOULD NOT be implemented explicitly. Instead declare a
+public state variable: `string public decimals` and let the solidity compiler
+create the getter.
 
 > **returns** `decimals`: Number of decimals used by the token.
 
