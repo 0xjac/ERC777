@@ -1,10 +1,7 @@
-# EIP 777
-A New Advanced Token Standard
+# EIP 777 ![travis-ci badge](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master)
+*A New Advanced Token Standard*
 
-## Authors
- - Jordi Baylina @jbaylina
- - Jacques Dafflon @jacquesd
- - Thomas Shababi
+This standard defines a new way to interact with a Token Contract. This standard takes advantage of [ERC-672](https://github.com/ethereum/EIPs/issues/672).
 
 ## Proposal
 Official Proposal with discussion: [github.com/ethereum/eips/issues/777](https://github.com/ethereum/eips/issues/777)
@@ -14,3 +11,8 @@ modifications to [eip-777.md](eip-777.md).
 
 ## Reference Implementation
 The reference implementation is available at: [contracts/ReferenceToken.sol](contracts/ReferenceToken.sol)
+
+## Authors
+ - Jordi Baylina @jbaylina
+ - Jacques Dafflon @jacquesd
+ - Thomas Shababi
