@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import "./EIP672.sol";
+import "./node_modules/eip672/contracts/EIP672.sol";
 import "./EIP777.sol";
 import "./ITokenFallback.sol";
 
@@ -13,8 +13,10 @@ contract ReferenceToken is EIP777, EIP672 {
   mapping(address => uint) balances;
   mapping(address => mapping(address => bool)) authorized;
 
-  function ReferenceToken() public {
-
+  function ReferenceToken(string _name, string _symbol, uint8 _decimals) public {
+    name = _name;
+    symbol = _symbol;
+    decimals = _decimals;
   }
 
   function balanceOf(address _tokenHolder) public constant returns (uint256) {
