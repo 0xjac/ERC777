@@ -96,7 +96,7 @@ contract ReferenceToken is EIP777, EIP672 {
     )
         private
     {
-        if (_value == 0) { return true; }
+        if (_value == 0) { return; }
 
         require(_to != 0);                  // forbid sending to 0x0 (=burning)
         require(_value > 0);                // only send positive amounts
@@ -113,8 +113,6 @@ contract ReferenceToken is EIP777, EIP672 {
             require(isEOA(_to));
         }
         Send(_from, _to, _value, _userData, _operator, _operatorData);
-
-        return true;
     }
 
     function isEOA(address _addr) private returns(bool) {
