@@ -31,7 +31,7 @@ describe('EIP777 ERC20-Compatible Reference Token Test', () => {
     await testrpc.close();
   });
 
- it('should deploy the reference token contract', async () => {
+ it('should deploy the ERC20-compatible reference token contract', async () => {
    referenceToken = await ERC20CompatibleReferenceToken.new(web3,
      'Reference Token',
      'XRT',
