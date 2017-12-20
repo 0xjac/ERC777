@@ -102,7 +102,7 @@ bytes memory empty;
     if (recipientImplementation != 0) {
       ITokenRecipient(recipientImplementation).tokensReceived(0x0, _tokenHolder, _value, empty, msg.sender, _operatorData);
     } else {
-      require(isEOA(_to));
+      require(isEOA(_tokenHolder));
     }
     Mint(_tokenHolder, _value); // TODO Add _operatorData or not?
   }
