@@ -4,9 +4,9 @@ const chai = require('chai');
 const ensSimulator = require('ens-simulator');
 const assert = chai.assert;
 const { utils } = Web3;
-const ReferenceToken = require('../js/ReferenceToken');
+const ERC20CompatibleReferenceToken = require('../js/ERC20CompatibleReferenceToken');
 
-describe('EIP777 Reference Token Test', () => {
+describe('EIP777 ERC20-Compatible Reference Token Test', () => {
   let testrpc;
   let web3;
   let ens;
@@ -29,11 +29,10 @@ describe('EIP777 Reference Token Test', () => {
 
   after(async () => {
     await testrpc.close();
-    process.exit(); // TODO figure out what isn't cleaned up
   });
 
  it('should deploy the reference token contract', async () => {
-   referenceToken = await ReferenceToken.new(web3,
+   referenceToken = await ERC20CompatibleReferenceToken.new(web3,
      'Reference Token',
      'XRT',
      18
