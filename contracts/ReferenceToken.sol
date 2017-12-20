@@ -2,9 +2,10 @@ pragma solidity ^0.4.18;
 
 import "./node_modules/eip672/contracts/EIP672.sol";
 import "./EIP777.sol";
-import "./ITokenFallback.sol";
+import "./ITokenRecipient.sol";
 
 contract ReferenceToken is EIP777, EIP672 {
+  address public owner;
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -13,24 +14,32 @@ contract ReferenceToken is EIP777, EIP672 {
   mapping(address => uint) balances;
   mapping(address => mapping(address => bool)) authorized;
 
+  modifier onlyOwner () {
+    require(msg.sender == owner);
+    _;
+  }
+
   function ReferenceToken(string _name, string _symbol, uint8 _decimals) public {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
+    owner = msg.sender;
   }
 
   function balanceOf(address _tokenHolder) public constant returns (uint256) {
     return balances[_tokenHolder];
   }
 
-  function send(address _to, uint256 _amount) public {
-    doSend(msg.sender, _to, _amount);
+  function send(address _to, uint256 _value) public {
+    bytes memory empty;
+    doSend(msg.sender, _to, _value, empty, msg.sender, empty);
   }
-  function send(address _to, uint256 _amount, bytes _data) public {
-    doSend(msg.sender, _to, _amount);
+  function send(address _to, uint256 _value, bytes _userData) public {
+bytes memory empty;
+    doSend(msg.sender, _to, _value, _userData, msg.sender, empty);
   }
-  function send(address _to, uint256 _amount, bytes _data, bytes32 ref) public {
-    doSend(msg.sender, _to, _amount);
+  function send(address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
+    doSend(msg.sender, _to, _value, _userData, msg.sender, _operatorData);
   }
 
   function authorizeOperator(address _operator, bool _authorized) public {
@@ -40,43 +49,61 @@ contract ReferenceToken is EIP777, EIP672 {
   function isOperatorAuthorizedFor(address _operator, address _tokenHoler) public constant returns (bool) {
     return authorized[_operator][_tokenHoler];
   }
-  function operatorSend(address _from, address _to, uint256 _amount, bytes _data, bytes32 _ref) public {
+  function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
     require(isOperatorAuthorizedFor(msg.sender, _from));
-    doSend(_from, _to, _amount);
+    doSend(_from, _to, _value, _userData, msg.sender, _operatorData);
   }
 
-  function doSend(address _from, address _to, uint256 _amount) private returns(bool) {
-    if (_amount == 0) { return true; }
+  function doSend(address _from, address _to, uint256 _value, bytes _userData, address _operator, bytes _operatorData) private returns(bool) {
+    if (_value == 0) { return true; }
 
-    require(_to != 0);                   // forbid sending to 0x0 (=burning)
-    require(_amount > 0);                // only send positive amounts
-    require(balances[_from] >= _amount); // ensure enough funds
+    require(_to != 0);                  // forbid sending to 0x0 (=burning)
+    require(_value > 0);                // only send positive amounts
+    require(balances[_from] >= _value); // ensure enough funds
 
-    balances[_from] -= _amount;
-    balances[_to] += _amount;
+    balances[_from] -= _value;
+    balances[_to] += _value;
 
-    Send(_from, _to, _amount, "", "", 0x0);
-    address fallbackImpl = interfaceAddr(_to, "ITokenFallback");
-    if (fallbackImpl != 0) { ITokenFallback(fallbackImpl).tokenFallback(_from, _to, _amount, "", ""); }
+    address recipientImplementation = interfaceAddr(_to, "ITokenRecipient");
+    if (recipientImplementation != 0) {
+      ITokenRecipient(recipientImplementation).tokensReceived(_from, _to, _value, _userData, _operator, _operatorData);
+    } else {
+      require(isEOA(_to));
+    }
+    Send(_from, _to, _value, _userData, _operator, _operatorData);
 
     return true;
   }
 
-  function burn(address _tokenHolder, uint256 _amount) private returns(bool) {
-    require(balanceOf(_tokenHolder) >= _amount);
+  function isEOA(address _addr) private returns(bool) {
+    uint size;
+    assembly { size := extcodesize(_addr) }
+    return size == 0;
+  }
 
-    balances[_tokenHolder] -= _amount;
-    totalSupply -= _amount;
+  function burn(address _tokenHolder, uint256 _value) public onlyOwner returns(bool) {
+    require(balanceOf(_tokenHolder) >= _value);
 
-    Burn(_tokenHolder, _amount); // TODO should we call tokenFallback on _tokenholder?
+    balances[_tokenHolder] -= _value;
+    totalSupply -= _value;
+
+    Burn(_tokenHolder, _value); // TODO should we call tokenFallback on _tokenholder?
 
     return true;
   }
 
-  function mint(address _tokenHolder, uint256 _amount) private returns(bool) {
-    balances[_tokenHolder] += _amount;
-    totalSupply += _amount;
+  function mint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
+    balances[_tokenHolder] += _value;
+    totalSupply += _value;
 
-    Mint(_tokenHolder, _amount); // TODO should we call tokenFallback on _tokenholder?
+    bytes memory empty;
+
+    address recipientImplementation = interfaceAddr(_tokenHolder, "ITokenRecipient");
+    if (recipientImplementation != 0) {
+      ITokenRecipient(recipientImplementation).tokensReceived(0x0, _tokenHolder, _value, empty, msg.sender, _operatorData);
+    } else {
+      require(isEOA(_to));
+    }
+    Mint(_tokenHolder, _value); // TODO Add _operatorData or not?
   }
 }
