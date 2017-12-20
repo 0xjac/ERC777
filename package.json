@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run build; mocha --harmony",
+    "test": "npm run build; mocha --harmony --exit",
     "sol-compile": "solcpiler -i './contracts/ReferenceToken.sol'",
     "build": "npm run sol-compile",
     "prepublish": "npm run build"
