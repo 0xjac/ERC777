@@ -28,7 +28,6 @@ describe('EIP777 Reference Token Test', () => {
   });
 
   after(async () => {
-    console.log(testrpc);
     await testrpc.close();
     process.exit(); // TODO figure out what isn't cleaned up
   });
