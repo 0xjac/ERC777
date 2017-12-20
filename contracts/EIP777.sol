@@ -3,7 +3,7 @@ pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
 
 interface EIP777 {
     function name() public constant returns (string);
-    function symbol() public constant returns (bytes32);
+    function symbol() public constant returns (string);
     function totalSupply() public constant returns (uint256);
     function decimals() public constant returns (uint8);
     function balanceOf(address owner) public constant returns (uint256);
