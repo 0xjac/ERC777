@@ -12,6 +12,7 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
+    bool public erc20compatible;
 
     mapping(address => uint) private balances;
     mapping(address => mapping(address => bool)) private authorized;
@@ -27,33 +28,41 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         symbol = _symbol;
         decimals = _decimals;
         owner = msg.sender;
+        erc20compatible = true;
+        totalSupply = 0;
     }
 
     function balanceOf(address _tokenHolder) public constant returns (uint256) {
         return balances[_tokenHolder];
     }
 
+    function setERC20Compatiblility(bool _erc20compatible) public onlyOwner { erc20compatible = _erc20compatible; }
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         bytes memory empty;
-        doTransfer(msg.sender, _to, _value, msg.sender, empty);
+        doSend(msg.sender, _to, _value, empty, msg.sender, empty);
         return true;
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(erc20compatible);
         require(_value <= allowed[_from][msg.sender]);
         bytes memory empty;
-        doTransfer(_from, _to, _value, msg.sender, empty);
+        // Cannot be after doSend because of tokensReceived re-entry, but before check?
         allowed[_from][msg.sender] -= _value;
+        doSend(_from, _to, _value, empty, msg.sender, empty);
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
+        require(erc20compatible);
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+        require(erc20compatible);
         return allowed[_owner][_spender];
     }
 
@@ -67,21 +76,18 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         doSend(msg.sender, _to, _value, _userData, msg.sender, empty);
     }
 
-    function send(address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
-        doSend(msg.sender, _to, _value, _userData, msg.sender, _operatorData);
-    }
-
     function authorizeOperator(address _operator, bool _authorized) public {
+        if (_operator == msg.sender) { return; } // TODO Should we throw?
         authorized[_operator][msg.sender] = _authorized;
         AuthorizeOperator(_operator, msg.sender, _authorized);
     }
 
-    function isOperatorAuthorizedFor(address _operator, address _tokenHoler) public constant returns (bool) {
-        return authorized[_operator][_tokenHoler];
+    function isOperatorAuthorizedFor(address _operator, address _tokenHolder) public constant returns (bool) {
+        return _operator == _tokenHolder || authorized[_operator][_tokenHolder];
     }
 
     function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
-        require(isOperatorAuthorizedFor(msg.sender, _from));
+        require(isOperatorAuthorizedFor(msg.sender, _from) || msg.sender == _from);
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData);
     }
 
@@ -91,7 +97,8 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         balances[_tokenHolder] -= _value;
         totalSupply -= _value;
 
-        Burn(_tokenHolder, _value); // TODO should we call tokenFallback on _tokenholder?
+        Burn(_tokenHolder, _value);
+        if (erc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
 
         return true;
     }
@@ -110,26 +117,8 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
             require(isEOA(_tokenHolder));
         }
         Mint(_tokenHolder, _value); // TODO Add _operatorData or not?
-    }
-
-    function doTransfer(address _from, address _to, uint256 _value, address _operator, bytes _operatorData) private {
-        if (_value == 0) { return; }
-
-        require(_to != address(0));         // forbid sending to 0x0 (=burning)
-        require(_value > 0);                // only send positive amounts
-        require(balances[_from] >= _value); // ensure enough funds
-
-        balances[_from] -= _value;
-        balances[_to] += _value;
-
-        bytes memory empty;
-        address recipientImplementation = interfaceAddr(_to, "ITokenRecipient");
-        if (recipientImplementation != 0) {
-            ITokenRecipient(recipientImplementation).tokensReceived(
-                _from, _to, _value, empty, _operator, _operatorData);
-        }
-
-        Transfer(_from, _to, _value);
+        if (erc20compatible) { Transfer(0x0, _tokenHolder, _value); } 
+        return true;
     }
 
     function doSend(
@@ -142,10 +131,8 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
     )
         private
     {
-        if (_value == 0) { return; }
-
         require(_to != address(0));         // forbid sending to 0x0 (=burning)
-        require(_value > 0);                // only send positive amounts
+        require(_value >= 0);                // only send positive amounts
         require(balances[_from] >= _value); // ensure enough funds
 
         balances[_from] -= _value;
@@ -158,7 +145,9 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         } else {
             require(isEOA(_to));
         }
+
         Send(_from, _to, _value, _userData, _operator, _operatorData);
+        if (erc20compatible) { Transfer(_from, _to, _value); }
     }
 
     function isEOA(address _addr) private returns(bool) {

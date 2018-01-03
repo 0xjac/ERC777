@@ -41,21 +41,18 @@ contract ReferenceToken is EIP777, EIP672 {
         doSend(msg.sender, _to, _value, _userData, msg.sender, empty);
     }
 
-    function send(address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
-        doSend(msg.sender, _to, _value, _userData, msg.sender, _operatorData);
-    }
-
     function authorizeOperator(address _operator, bool _authorized) public {
+        if (_operator == msg.sender) { return; } // TODO Should we throw?
         authorized[_operator][msg.sender] = _authorized;
         AuthorizeOperator(_operator, msg.sender, _authorized);
     }
 
-    function isOperatorAuthorizedFor(address _operator, address _tokenHoler) public constant returns (bool) {
-        return authorized[_operator][_tokenHoler];
+    function isOperatorAuthorizedFor(address _operator, address _tokenHolder) public constant returns (bool) {
+        return _operator == _tokenHolder || authorized[_operator][_tokenHolder];
     }
 
     function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
-        require(isOperatorAuthorizedFor(msg.sender, _from));
+        require(isOperatorAuthorizedFor(msg.sender, _from) || msg.sender == _from);
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData);
     }
 
@@ -70,7 +67,7 @@ contract ReferenceToken is EIP777, EIP672 {
         return true;
     }
 
-    function mint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
+    function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
         balances[_tokenHolder] += _value;
         totalSupply += _value;
 
@@ -96,10 +93,8 @@ contract ReferenceToken is EIP777, EIP672 {
     )
         private
     {
-        if (_value == 0) { return; }
-
         require(_to != 0);                  // forbid sending to 0x0 (=burning)
-        require(_value > 0);                // only send positive amounts
+        require(_value >= 0);               // only send positive amounts
         require(balances[_from] >= _value); // ensure enough funds
 
         balances[_from] -= _value;

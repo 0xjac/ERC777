@@ -10,7 +10,6 @@ interface EIP777 {
 
     function send(address to, uint256 amount) public;
     function send(address to, uint256 amount, bytes userData) public;
-    function send(address to, uint256 amount, bytes userData, bytes operatorData) public;
 
     function authorizeOperator(address operator, bool authorized) public;
     function isOperatorAuthorizedFor(address operator, address tokenHolder) public constant returns (bool);
@@ -24,7 +23,7 @@ interface EIP777 {
         address indexed operator,
         bytes operatorData
     );
-    event Mint(address indexed to, uint256 amount);  // solhint-disable-line separate-by-one-line-in-contract
+    event Mint(address indexed to, uint256 amount); // solhint-disable-line separate-by-one-line-in-contract
     event Burn(address indexed from, uint256 amount);
     // solhint-disable-next-line no-simple-event-func-name
     event AuthorizeOperator(address indexed operator, address indexed tokenHolder, bool authorize);
