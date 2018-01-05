@@ -39,6 +39,7 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
     function setERC20Compatiblility(bool _erc20compatible) public onlyOwner { erc20compatible = _erc20compatible; }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
+        require(erc20compatible);
         bytes memory empty;
         doSend(msg.sender, _to, _value, empty, msg.sender, empty);
         return true;
