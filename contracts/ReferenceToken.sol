@@ -42,13 +42,13 @@ contract ReferenceToken is EIP777, EIP672 {
     }
 
     function authorizeOperator(address _operator) public {
-        if (_operator == msg.sender) { return; } // TODO Should we throw?
+        require(_operator != msg.sender);
         authorized[_operator][msg.sender] = true;
         AuthorizedOperator(_operator, msg.sender);
     }
 
     function revokeOperator(address _operator) public {
-        if (_operator == msg.sender) { return; } // TODO Should we throw?
+        require(_operator != msg.sender);
         authorized[_operator][msg.sender] = false;
         RevokedOperator(_operator, msg.sender);
     }
