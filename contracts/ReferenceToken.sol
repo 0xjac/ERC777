@@ -78,7 +78,7 @@ contract ReferenceToken is EIP777, EIP672 {
             ITokenRecipient(recipientImplementation).tokensReceived(
                 0x0, _tokenHolder, _value, empty, msg.sender, _operatorData);
         } else {
-            require(isEOA(_tokenHolder));
+            require(!isContract(_tokenHolder));
         }
         Mint(_tokenHolder, _value); // TODO Add _operatorData or not?
     }
@@ -105,14 +105,8 @@ contract ReferenceToken is EIP777, EIP672 {
             ITokenRecipient(recipientImplementation).tokensReceived(
                 _from, _to, _value, _userData, _operator, _operatorData);
         } else {
-            require(isEOA(_to));
+            require(!isContract(_to));
         }
         Send(_from, _to, _value, _userData, _operator, _operatorData);
-    }
-
-    function isEOA(address _addr) private returns(bool) {
-        uint size;
-        assembly { size := extcodesize(_addr) } // solhint-disable-line no-inline-assembly
-        return size == 0;
     }
 }
