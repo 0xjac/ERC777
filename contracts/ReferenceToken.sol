@@ -80,7 +80,7 @@ contract ReferenceToken is EIP777, EIP672 {
         } else {
             require(!isContract(_tokenHolder));
         }
-        Mint(_tokenHolder, _value); // TODO Add _operatorData or not?
+        Mint(_tokenHolder, _value, msg.sender, _operatorData);
     }
 
     function doSend(

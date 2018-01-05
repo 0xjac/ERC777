@@ -22,8 +22,8 @@ interface EIP777 {
         bytes userData,
         address indexed operator,
         bytes operatorData
-    );
-    event Mint(address indexed to, uint256 amount); // solhint-disable-line separate-by-one-line-in-contract
+    ); // solhint-disable-next-line separate-by-one-line-in-contract
+    event Mint(address indexed to, uint256 amount, address indexed operator, bytes operatorData);
     event Burn(address indexed from, uint256 amount);
     // solhint-disable-next-line no-simple-event-func-name
     event AuthorizeOperator(address indexed operator, address indexed tokenHolder, bool authorize);
