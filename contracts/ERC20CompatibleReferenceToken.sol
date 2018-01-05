@@ -76,10 +76,16 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         doSend(msg.sender, _to, _value, _userData, msg.sender, empty);
     }
 
-    function authorizeOperator(address _operator, bool _authorized) public {
+    function authorizeOperator(address _operator) public {
         if (_operator == msg.sender) { return; } // TODO Should we throw?
-        authorized[_operator][msg.sender] = _authorized;
-        AuthorizeOperator(_operator, msg.sender, _authorized);
+        authorized[_operator][msg.sender] = true;
+        AuthorizedOperator(_operator, msg.sender);
+    }
+
+    function revokeOperator(address _operator) public {
+        if (_operator == msg.sender) { return; } // TODO Should we throw?
+        authorized[_operator][msg.sender] = false;
+        RevokedOperator(_operator, msg.sender);
     }
 
     function isOperatorAuthorizedFor(address _operator, address _tokenHolder) public constant returns (bool) {
