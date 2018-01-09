@@ -32,9 +32,7 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP820 {
         totalSupply = 0;
     }
 
-    function balanceOf(address _tokenHolder) public constant returns (uint256) {
-        return balances[_tokenHolder];
-    }
+    function balanceOf(address _tokenHolder) public constant returns (uint256) { return balances[_tokenHolder]; }
 
     function setERC20Compatiblility(bool _erc20compatible) public onlyOwner { erc20compatible = _erc20compatible; }
 
@@ -89,12 +87,12 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP820 {
         RevokedOperator(_operator, msg.sender);
     }
 
-    function isOperatorAuthorizedFor(address _operator, address _tokenHolder) public constant returns (bool) {
+    function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
         return _operator == _tokenHolder || authorized[_operator][_tokenHolder];
     }
 
     function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
-        require(isOperatorAuthorizedFor(msg.sender, _from) || msg.sender == _from);
+        require(isOperatorFor(msg.sender, _from) || msg.sender == _from);
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData);
     }
 
@@ -128,6 +126,13 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP820 {
         return true;
     }
 
+    function isContract(address _addr) internal constant returns(bool) {
+        if (_addr == 0) { return false; }
+        uint size;
+        assembly { size := extcodesize(_addr) } // solhint-disable-line no-inline-assembly
+        return size > 0;
+    }
+
     function doSend(
         address _from,
         address _to,
@@ -155,12 +160,5 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP820 {
 
         Send(_from, _to, _value, _userData, _operator, _operatorData);
         if (erc20compatible) { Transfer(_from, _to, _value); }
-    }
-
-    function isContract(address _addr) constant internal returns(bool) {
-        if (_addr == 0) { return false; }
-        uint size;
-        assembly { size := extcodesize(_addr) }
-        return size > 0;
     }
 }
