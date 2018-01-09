@@ -1,12 +1,12 @@
 pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
 
-import "./node_modules/eip672/contracts/EIP672.sol";
+import "./node_modules/eip820/contracts/EIP820.sol";
 import "./ERC20.sol";
 import "./EIP777.sol";
 import "./ITokenRecipient.sol";
 
 
-contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
+contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP820 {
     address public owner;
     string public name;
     string public symbol;
@@ -139,7 +139,7 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
         private
     {
         require(_to != address(0));         // forbid sending to 0x0 (=burning)
-        require(_value >= 0);                // only send positive amounts
+        require(_value >= 0);               // only send positive amounts
         require(balances[_from] >= _value); // ensure enough funds
 
         balances[_from] -= _value;
@@ -155,5 +155,12 @@ contract ERC20CompatibleReferenceToken is ERC20, EIP777, EIP672 {
 
         Send(_from, _to, _value, _userData, _operator, _operatorData);
         if (erc20compatible) { Transfer(_from, _to, _value); }
+    }
+
+    function isContract(address _addr) constant internal returns(bool) {
+        if (_addr == 0) { return false; }
+        uint size;
+        assembly { size := extcodesize(_addr) }
+        return size > 0;
     }
 }

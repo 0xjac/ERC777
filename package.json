@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "npm run build; mocha --harmony --exit",
-    "sol-compile": "solcpiler -i './contracts/*.sol'",
+    "sol-compile": "solcpiler -i 'node_modules/eip820/contracts/InterfaceImplementationRegistry.sol' && solcpiler -i './contracts/*.sol'",
     "build": "npm run sol-compile",
     "prepublish": "npm run build"
   },
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/jacquesd/eip777#readme",
   "dependencies": {
-    "eip672": "0.0.3",
+    "eip820": "0.0.1",
     "ens-simulator": "^0.3.2",
     "web3": "^1.0.0-beta.27"
   },
