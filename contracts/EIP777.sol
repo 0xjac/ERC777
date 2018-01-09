@@ -14,7 +14,7 @@ interface EIP777 {
 
     function authorizeOperator(address operator) public;
     function revokeOperator(address operator) public;
-    function isOperatorAuthorizedFor(address operator, address tokenHolder) public constant returns (bool);
+    function isOperatorFor(address operator, address tokenHolder) public constant returns (bool);
     function operatorSend(address from, address to, uint256 amount, bytes userData, bytes operatorData) public;
 
     event Send( // solhint-disable-line no-simple-event-func-name
