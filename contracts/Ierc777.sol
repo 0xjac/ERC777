@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
 
 
-interface EIP777 {
+interface Ierc777 {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
     function totalSupply() public constant returns (uint256);
