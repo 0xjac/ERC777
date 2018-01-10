@@ -9,6 +9,5 @@ interface ITokenRecipient {
         bytes userData,
         address operator,
         bytes operatorData
-    )
-        public;
+    ) public;
 }
