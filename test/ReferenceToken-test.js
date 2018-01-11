@@ -1,7 +1,8 @@
 const TestRPC = require('ethereumjs-testrpc');
 const Web3 = require('web3');
 const chai = require('chai');
-const Registry = require('../js/InterfaceImplementationRegistry')
+const EIP820 = require('EIP820');
+const TokenableContractsRegistry = require('../js/TokenableContractsRegistry');
 const ReferenceToken = require('../js/ReferenceToken');
 
 const assert = chai.assert;
@@ -13,8 +14,9 @@ describe('EIP777 Reference Token Test', () => {
   let testrpc;
   let web3;
   let accounts;
-  let registry;
   let referenceToken;
+  let tokenableContractsRegistry;
+  let interfaceImplementationRegistry;
 
   before(async () => {
     testrpc = TestRPC.server({
@@ -27,15 +29,19 @@ describe('EIP777 Reference Token Test', () => {
     web3 = new Web3('ws://localhost:8546');
     accounts = await web3.eth.getAccounts();
 
-    registry = await Registry.new(web3);
-    assert.ok(registry.$address);
+    interfaceImplementationRegistry = await EIP820.deploy(web3, accounts[0]);
+    assert.ok(interfaceImplementationRegistry.$address);
   });
 
   after(async () => await testrpc.close());
 
   it('should deploy the reference token contract', async () => {
+
+    tokenableContractsRegistry = await TokenableContractsRegistry.new(web3);
+    assert.ok(tokenableContractsRegistry.$address);
+
     referenceToken = await ReferenceToken.new(web3,
-      'Reference Token', 'XRT', 18);
+      'Reference Token', 'XRT', 18, tokenableContractsRegistry.$address);
     assert.ok(referenceToken.$address);
 
     const name = await referenceToken.name();
