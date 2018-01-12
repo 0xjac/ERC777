@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
+pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "../node_modules/giveth-common-contracts/contracts/Owned.sol";
 
