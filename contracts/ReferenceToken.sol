@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "../node_modules/eip820/contracts/EIP820.sol";
@@ -130,7 +134,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         RevokedOperator(_operator, msg.sender);
     }
 
-    /** @notice Check whether `_operator` is allowed to manage the tokens held by `_tokenHolder`. */
+    /** @notice Check whether '_operator' is allowed to manage the tokens held by '_tokenHolder'. */
     function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
         return _operator == _tokenHolder || mAuthorized[_operator][_tokenHolder];
     }

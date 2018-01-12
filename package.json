@@ -18,7 +18,7 @@
     "url": "git+https://github.com/jacquesd/eip777.git"
   },
   "author": "Jordi Baylina @jbaylina, Jacques Dafflon @jacquesd, Thomas Shababi @tshabs",
-  "license": "GPLv3",
+  "license": "MPL 2.0",
   "bugs": {
     "url": "https://github.com/jacquesd/eip777/issues"
   },
