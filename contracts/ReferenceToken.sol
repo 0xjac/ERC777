@@ -2,6 +2,7 @@ pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "../node_modules/eip820/contracts/EIP820.sol";
 import "../node_modules/giveth-common-contracts/contracts/Owned.sol";
+import "../node_modules/giveth-common-contracts/contracts/SafeMath.sol";
 import "./Ierc20.sol";
 import "./Ierc777.sol";
 import "./ITokenRecipient.sol";
@@ -9,131 +10,178 @@ import "./TokenableContractsRegistry.sol";
 
 
 contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
+    using SafeMath for uint256;
 
-    string prvName;
-    string prvSymbol;
-    uint8  prvDecimals;
-    uint256 prvTotalSupply;
+    string private mName;
+    string private mSymbol;
+    uint8  private mDecimals;
+    uint256 private mTotalSupply;
 
-    bool prvErc20compatible;
+    bool private mErc20compatible;
 
     TokenableContractsRegistry public tokenableContractsRegistry;
 
-    mapping(address => uint) private balances;
-    mapping(address => mapping(address => bool)) private authorized;
-    mapping(address => mapping(address => uint256)) private allowed;
+    mapping(address => uint) private mBalances;
+    mapping(address => mapping(address => bool)) private mAuthorized;
+    mapping(address => mapping(address => uint256)) private mAllowed;
 
     modifier erc20 () {
-        require(prvErc20compatible);
+        require(mErc20compatible);
         _;
     }
 
-    function ReferenceToken(string _name, string _symbol, uint8 _decimals, TokenableContractsRegistry _tokenableContractsRegistry) public {
-        prvName = _name;
-        prvSymbol = _symbol;
-        prvDecimals = _decimals;
-        prvTotalSupply = 0;
-        prvErc20compatible = true;
+    function ReferenceToken(
+        string _name,
+        string _symbol,
+        TokenableContractsRegistry _tokenableContractsRegistry
+    )
+        public
+    {
+        mName = _name;
+        mSymbol = _symbol;
+        mDecimals = 18;
+        mTotalSupply = 0;
+        mErc20compatible = true;
 
         tokenableContractsRegistry = _tokenableContractsRegistry;
         setInterfaceImplementation("Ierc777", this);
         setInterfaceImplementation("Ierc20", this);
     }
 
+    /** @notice Return the name of the token */
+    function name() public constant returns (string) { return mName; }
+    /** @notice Return the symbol of the token */
+    function symbol() public constant returns(string) { return mSymbol; }
+    /** @notice Return the number of decimals the token uses */
+    function decimals() public constant returns(uint8) { return mDecimals; }
+    /** @notice Return the Total token supply */
+    function totalSupply() public constant returns(uint256) { return mTotalSupply; }
 
-    function name() public constant returns (string) { return prvName; }
-    function symbol() public constant returns(string) { return prvSymbol; }
-    function decimals() public constant returns(uint8) { return prvDecimals; }
-    function totalSupply() public constant returns(uint256) { return prvTotalSupply; }
-    function erc20compatible() public constant returns(bool) { return prvErc20compatible; }
-
+    /**
+     * @notice Return the account balance of some account
+     *
+     * @param _tokenHolder Address for whith to return the balance
+     */
     function balanceOf(address _tokenHolder) public constant returns (uint256) {
-        return balances[_tokenHolder];
+        return mBalances[_tokenHolder];
     }
 
-    function turnOffErcCompatibility() public onlyOwner {
-        prvErc20compatible = false;
+    /** @notice Disable the ERC-20 interface */
+    function disableERC20() public onlyOwner {
+        mErc20compatible = false;
         setInterfaceImplementation("Ierc20", 0x0);
     }
 
-    function transfer(address _to, uint256 _value) erc20 public returns (bool success) {
+    /** @notice Enable the ERC-20 interface */
+    function enableERC20() public onlyOwner {
+        mErc20compatible = true;
+        setInterfaceImplementation("Ierc20", this);
+    }
+
+    /** @notice ERC-20 transfer */
+    function transfer(address _to, uint256 _value) public erc20 returns (bool success) {
         doSend(msg.sender, _to, _value, "", msg.sender, "", false);
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) erc20 public returns (bool success) {
-        require(_value <= allowed[_from][msg.sender]);
+    /** @notice ERC-20 transferFrom */
+    function transferFrom(address _from, address _to, uint256 _value) public erc20 returns (bool success) {
+        require(_value <= mAllowed[_from][msg.sender]);
 
-        // Cannot be after doSend because of tokensReceived re-entry, but before check?
-        allowed[_from][msg.sender] -= _value;
+        // Cannot be after doSend because of tokensReceived re-entry
+        mAllowed[_from][msg.sender] = mAllowed[_from][msg.sender].sub(_value);
         doSend(_from, _to, _value, "", msg.sender, "", false);
         return true;
     }
 
-    function approve(address _spender, uint256 _value) erc20 public returns (bool success) {
-        allowed[msg.sender][_spender] = _value;
+    /** @notice ERC-20 approve */
+    function approve(address _spender, uint256 _value) public erc20 returns (bool success) {
+        mAllowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    function allowance(address _owner, address _spender) erc20 public constant returns (uint256 remaining) {
-        return allowed[_owner][_spender];
+    /** @notice ERC-20 allowance */
+    function allowance(address _owner, address _spender) public erc20 constant returns (uint256 remaining) {
+        return mAllowed[_owner][_spender];
     }
 
+    /** @notice Send '_value' amount of tokens to address '_to'. */
     function send(address _to, uint256 _value) public {
         doSend(msg.sender, _to, _value, "", msg.sender, "", true);
     }
 
+    /** @notice Send '_value' amount of tokens to address '_to'. */
     function send(address _to, uint256 _value, bytes _userData) public {
         doSend(msg.sender, _to, _value, _userData, msg.sender, "", true);
     }
 
+    /** @notice Authorize a third party '_operator' to manage (send) 'msg.sender''s tokens. */
     function authorizeOperator(address _operator) public {
         require(_operator != msg.sender);
-        authorized[_operator][msg.sender] = true;
+        mAuthorized[_operator][msg.sender] = true;
         AuthorizedOperator(_operator, msg.sender);
     }
 
+    /** @notice Revoke a third party '_operator''s rights to manage (send) 'msg.sender''s tokens. */
     function revokeOperator(address _operator) public {
         require(_operator != msg.sender);
-        authorized[_operator][msg.sender] = false;
+        mAuthorized[_operator][msg.sender] = false;
         RevokedOperator(_operator, msg.sender);
     }
 
+    /** @notice Check whether `_operator` is allowed to manage the tokens held by `_tokenHolder`. */
     function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
-        return _operator == _tokenHolder || authorized[_operator][_tokenHolder];
+        return _operator == _tokenHolder || mAuthorized[_operator][_tokenHolder];
     }
 
+    /** @notice Send '_value' amount of tokens from the address '_from' to the address '_to'. */
     function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
         require(isOperatorFor(msg.sender, _from));
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData, true);
     }
 
+    /** @notice Sample burn function to showcase the use of the 'Burn' event. */
     function burn(address _tokenHolder, uint256 _value) public onlyOwner returns(bool) {
         require(balanceOf(_tokenHolder) >= _value);
 
-        balances[_tokenHolder] -= _value;
-        prvTotalSupply -= _value;
+        mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
+        mTotalSupply = mTotalSupply.sub(_value);
 
         Burn(_tokenHolder, _value);
-        if (prvErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
+        if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
 
         return true;
     }
 
+    /** @notice Sample mint function to showcase the use of the 'Mint' event and the logic to notify the recipient. */
     function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
-
-        require(prvTotalSupply + _value >= prvTotalSupply); // Overflow check
-        prvTotalSupply += _value;
-        balances[_tokenHolder] += _value;
+        mTotalSupply = mTotalSupply.add(_value);
+        mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_value);
 
         callRecipent(0x0, _tokenHolder, _value, "", msg.sender, _operatorData, true);
 
         Mint(_tokenHolder, _value, msg.sender, _operatorData);
-        if (prvErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
+        if (mErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
+
         return true;
     }
 
+    /** @notice Check whether a contrat address registered with the Tokenable Contract Registry to receive tokens*/
+    function isTokenable(address _addr) internal constant returns(bool) {
+        if (address(tokenableContractsRegistry) == 0x0) return false;
+        return tokenableContractsRegistry.isTokenable(_addr);
+    }
+
+    /** @notice Check whether an address is a regular address or not. */
+    function isRegularAddress(address _addr) internal constant returns(bool) {
+        if (_addr == 0) { return false; }
+        uint size;
+        assembly { size := extcodesize(_addr) } // solhint-disable-line no-inline-assembly
+        return size == 0;
+    }
+
+    /** @dev Perform an actual send of tokens. */
     function doSend(
         address _from,
         address _to,
@@ -141,23 +189,24 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         bytes _userData,
         address _operator,
         bytes _operatorData,
-        bool _isSend
+        bool _preventLocking
     )
         private
     {
         require(_to != address(0));         // forbid sending to 0x0 (=burning)
-        require(_value >= 0);               // only send positive amounts
-        require(balances[_from] >= _value); // ensure enough funds
+        require(_value >= 0);                // only send positive amounts
+        require(mBalances[_from] >= _value); // ensure enough funds
 
-        balances[_from] -= _value;
-        balances[_to] += _value;
+        mBalances[_from] = mBalances[_from].sub(_value);
+        mBalances[_to] = mBalances[_to].add(_value);
 
-        callRecipent(_from, _to, _value, _userData, _operator, _operatorData, _isSend);
+        callRecipent(_from, _to, _value, _userData, _operator, _operatorData, _preventLocking);
 
         Send(_from, _to, _value, _userData, _operator, _operatorData);
-        if (prvErc20compatible) { Transfer(_from, _to, _value); }
+        if (mErc20compatible) { Transfer(_from, _to, _value); }
     }
 
+    /** @dev Notify a recipient of received tokens. */
     function callRecipent(
         address _from,
         address _to,
@@ -165,49 +214,14 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         bytes _userData,
         address _operator,
         bytes _operatorData,
-        bool isSend
+        bool _preventLocking
     ) private {
         address recipientImplementation = interfaceAddr(_to, "ITokenRecipient");
         if (recipientImplementation != 0) {
             ITokenRecipient(recipientImplementation).tokensReceived(
                 _from, _to, _value, _userData, _operator, _operatorData);
-        } else {
-            if (isSend) {
-                require(isAddress(_to) || isTokenable(_to));
-            }
+        } else if (_preventLocking) {
+            require(isRegularAddress(_to) || isTokenable(_to));
         }
     }
-
-
-    function isTokenable(address _addr) internal constant returns(bool) {
-        if (address(tokenableContractsRegistry) == 0x0) return false;
-        return tokenableContractsRegistry.isTokenable(_addr);
-    }
-
-    function isAddress(address _addr) internal constant returns(bool) {
-        if (_addr == 0) { return false; }
-        uint size;
-        assembly { size := extcodesize(_addr) } // solhint-disable-line no-inline-assembly
-        return size == 0;
-    }
-
-    function getCodeHash(address addr) view public returns(bytes32) {
-        bytes memory o_code;
-        assembly {
-            // retrieve the size of the code, this needs assembly
-            let size := extcodesize(addr)
-            // allocate output byte array - this could also be done without assembly
-            // by using o_code = new bytes(size)
-            o_code := mload(0x40)
-            // new "memory end" including padding
-            mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
-            // store length in memory
-            mstore(o_code, size)
-            // actually retrieve the code, this needs assembly
-            extcodecopy(addr, add(o_code, 0x20), 0, size)
-        }
-        return keccak256(o_code);
-    }
-
-
 }
