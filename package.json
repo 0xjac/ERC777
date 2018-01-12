@@ -2,16 +2,7 @@
   "name": "eip777",
   "version": "0.0.1",
   "description": "A New Advanced Token Standard",
-  "keywords": [
-    "ERC20",
-    "ERC-20",
-    "ERC-777",
-    "ERC77",
-    "Token",
-    "Standard",
-    "Solidity",
-    "Ethereum"
-  ],
+  "keywords": ["ERC20", "ERC-20", "ERC-777", "ERC77", "Token", "Standard", "Solidity", "Ethereum"],
   "main": "js/ReferenceToken.js",
   "directories": {
     "test": "test"
@@ -27,11 +18,7 @@
     "type": "git",
     "url": "git+https://github.com/jacquesd/eip777.git"
   },
-  "contributors": [
-    "Jordi Baylina",
-    "Jacques Dafflon",
-    "Thomas Shababi"
-  ],
+  "contributors": ["Jordi Baylina", "Jacques Dafflon", "Thomas Shababi"],
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/jacquesd/eip777/issues"

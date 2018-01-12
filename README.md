@@ -1,4 +1,4 @@
-# EIP 777 ![travis-ci badge](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+# EIP 777 [![Build Status](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master)](https://travis-ci.com/jacquesd/eip777) [![GitHub license](https://img.shields.io/github/license/jacquesd/eip777.svg)](https://github.com/jacquesd/eip777/blob/master/LICENSE)
 *A New Advanced Token Standard*
 
 This standard defines a new way to interact with a Token Contract. This standard takes advantage of [ERC-820](https://github.com/ethereum/EIPs/issues/820).
