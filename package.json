@@ -28,9 +28,16 @@
     "url": "git+https://github.com/jacquesd/eip777.git"
   },
   "contributors": [
-    "Jordi Baylina",
-    "Jacques Dafflon",
-    "Thomas Shababi"
+    {
+      "name": "Jordi Baylina",
+      "url": "https://github.com/jbaylina"
+    }, {
+     "name": "Jacques Dafflon",
+     "url": "https://github.com/jacquesd"
+     }, {
+      "name": "Thomas Shababi",
+      "url": "https://github.com/tshabs"
+    }
   ],
   "license": "MPL-2.0",
   "bugs": {
