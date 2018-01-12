@@ -1,4 +1,8 @@
-pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
 interface ITokenRecipient {

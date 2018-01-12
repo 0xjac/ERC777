@@ -1,7 +1,11 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const TestRPC = require('ethereumjs-testrpc');
 const Web3 = require('web3');
 const chai = require('chai');
-const EIP820 = require('EIP820');
+const EIP820 = require('eip820');
 const TokenableContractsRegistry = require('../js/TokenableContractsRegistry');
 const ReferenceToken = require('../js/ReferenceToken');
 
@@ -41,7 +45,7 @@ describe('EIP777 Reference Token Test', () => {
     assert.ok(tokenableContractsRegistry.$address);
 
     referenceToken = await ReferenceToken.new(web3,
-      'Reference Token', 'XRT', 18, tokenableContractsRegistry.$address);
+      'Reference Token', 'XRT', tokenableContractsRegistry.$address);
     assert.ok(referenceToken.$address);
 
     const name = await referenceToken.name();
@@ -61,7 +65,7 @@ describe('EIP777 Reference Token Test', () => {
     log(`totalSupply: ${totalSupply}`);
   }).timeout(20000);
 
-  it('should mint tokens for address 1', async () => {
+  it('should mint 10 tokens for address 1', async () => {
     blocks[0] = await web3.eth.getBlockNumber();
     log(`block 0 -> ${blocks[0]}`);
 

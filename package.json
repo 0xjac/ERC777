@@ -2,36 +2,50 @@
   "name": "eip777",
   "version": "0.0.1",
   "description": "A New Advanced Token Standard",
-  "main": "",
+  "keywords": [
+    "ERC20",
+    "ERC-20",
+    "ERC-777",
+    "ERC77",
+    "Token",
+    "Standard",
+    "Solidity",
+    "Ethereum"
+  ],
+  "main": "js/ReferenceToken.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "npm run build; mocha --harmony --exit",
-    "sol-compile": "solcpiler -i 'node_modules/eip820/contracts/InterfaceImplementationRegistry.sol' && solcpiler -i './contracts/*.sol'",
-    "build": "npm run sol-compile",
-    "prepublish": "npm run build"
+    "sol-compile": "solcpiler -i './contracts/*.sol'",
+    "build": "npm run clean && npm run sol-compile",
+    "prepare": "npm run build",
+    "clean": "rm -rf ./build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jacquesd/eip777.git"
   },
-  "author": "Jordi Baylina @jbaylina, Jacques Dafflon @jacquesd, Thomas Shababi @tshabs",
-  "license": "GPLv3",
+  "contributors": [
+    "Jordi Baylina",
+    "Jacques Dafflon",
+    "Thomas Shababi"
+  ],
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/jacquesd/eip777/issues"
   },
   "homepage": "https://github.com/jacquesd/eip777#readme",
   "dependencies": {
     "eip820": "0.0.6",
-    "ens-simulator": "^0.3.2",
     "giveth-common-contracts": "^0.4.0",
+    "solcpiler": "0.0.11",
     "web3": "^1.0.0-beta.27"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "ethereumjs-testrpc": "git://github.com/jbaylina/testrpc.git",
-    "mocha": "^4.1.0",
-    "solcpiler": "0.0.11"
+    "mocha": "^4.1.0"
   }
 }

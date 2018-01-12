@@ -1,5 +1,8 @@
-pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 interface Ierc777 {
     function name() public constant returns (string);
@@ -7,7 +10,6 @@ interface Ierc777 {
     function totalSupply() public constant returns (uint256);
     function decimals() public constant returns (uint8);
     function balanceOf(address owner) public constant returns (uint256);
-    function erc20compatible() public constant returns (bool);
 
     function send(address to, uint256 amount) public;
     function send(address to, uint256 amount, bytes userData) public;

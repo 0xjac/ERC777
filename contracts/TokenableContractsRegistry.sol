@@ -1,4 +1,8 @@
-pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "../node_modules/giveth-common-contracts/contracts/Owned.sol";
 
@@ -8,21 +12,13 @@ contract TokenableContractsRegistry is Owned {
     mapping (address => bool) public tokenableInstances;
     mapping (bytes32 => bool) public tokenableSources;
 
-    function setInstanceTokenable(address instance) onlyOwner public {
-        tokenableInstances[instance]=true;
-    }
+    function setInstanceTokenable(address instance) public onlyOwner { tokenableInstances[instance] = true; }
 
-    function setInstanceUntokenable(address instance) onlyOwner public {
-        tokenableInstances[instance]=false;
-    }
+    function unsetInstancetokenable(address instance) public onlyOwner { tokenableInstances[instance] = false; }
 
-    function setCodeTokenable(bytes32 codeHash) onlyOwner public {
-        tokenableSources[codeHash] = true;
-    }
+    function setCodeTokenable(bytes32 codeHash) public onlyOwner { tokenableSources[codeHash] = true; }
 
-    function setCodeUntokenable(bytes32 codeHash) onlyOwner public {
-        tokenableSources[codeHash] = false;
-    }
+    function unsetCodetokenable(bytes32 codeHash) public onlyOwner { tokenableSources[codeHash] = false; }
 
     function isTokenable(address addr) public constant returns (bool) {
         if (tokenableInstances[addr]) return true;
@@ -31,20 +27,19 @@ contract TokenableContractsRegistry is Owned {
     }
 
     function getCodeHash(address addr) public constant returns(bytes32) {
-        bytes memory o_code;
-        assembly {
+        bytes memory oCode;
+        assembly { // solhint-disable-line no-inline-assembly
             // retrieve the size of the code, this needs assembly
             let size := extcodesize(addr)
-            // allocate output byte array - this could also be done without assembly
-            // by using o_code = new bytes(size)
-            o_code := mload(0x40)
+            // allocate output byte array - this could also be done without assembly by using oCode = new bytes(size)
+            oCode := mload(0x40)
             // new "memory end" including padding
-            mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(0x40, add(oCode, and(add(add(size, 0x20), 0x1f), not(0x1f))))
             // store length in memory
-            mstore(o_code, size)
+            mstore(oCode, size)
             // actually retrieve the code, this needs assembly
-            extcodecopy(addr, add(o_code, 0x20), 0, size)
+            extcodecopy(addr, add(oCode, 0x20), 0, size)
         }
-        return keccak256(o_code);
+        return keccak256(oCode);
     }
 }
