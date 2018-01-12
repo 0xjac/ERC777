@@ -8,9 +8,10 @@
   },
   "scripts": {
     "test": "npm run build; mocha --harmony --exit",
-    "sol-compile": "solcpiler -i 'node_modules/eip820/contracts/InterfaceImplementationRegistry.sol' && solcpiler -i './contracts/*.sol'",
-    "build": "npm run sol-compile",
-    "prepublish": "npm run build"
+    "sol-compile": "solcpiler -i './contracts/*.sol'",
+    "build": "npm run clean && npm run sol-compile",
+    "prepublish": "npm run build",
+    "clean": "rm -rf ./build"
   },
   "repository": {
     "type": "git",
