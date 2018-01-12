@@ -2,7 +2,8 @@
   "name": "eip777",
   "version": "0.0.1",
   "description": "A New Advanced Token Standard",
-  "main": "",
+  "keywords": ["ERC20", "ERC-20", "ERC-777", "ERC77", "Token", "Standard", "Solidity", "Ethereum"],
+  "main": "js/ReferenceToken.js",
   "directories": {
     "test": "test"
   },
@@ -10,15 +11,15 @@
     "test": "npm run build; mocha --harmony --exit",
     "sol-compile": "solcpiler -i './contracts/*.sol'",
     "build": "npm run clean && npm run sol-compile",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "clean": "rm -rf ./build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jacquesd/eip777.git"
   },
-  "author": "Jordi Baylina @jbaylina, Jacques Dafflon @jacquesd, Thomas Shababi @tshabs",
-  "license": "MPL 2.0",
+  "contributors": ["Jordi Baylina", "Jacques Dafflon", "Thomas Shababi"],
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/jacquesd/eip777/issues"
   },
