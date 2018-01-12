@@ -1,4 +1,8 @@
-# EIP 777 [![Build Status](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master)](https://travis-ci.com/jacquesd/eip777) [![GitHub license](https://img.shields.io/github/license/jacquesd/eip777.svg)](https://github.com/jacquesd/eip777/blob/master/LICENSE)
+# EIP 777
+[![Build Status](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master)](https://travis-ci.com/jacquesd/eip777)
+[![License](https://img.shields.io/github/license/jacquesd/eip777.svg)](https://github.com/jacquesd/eip777/blob/master/LICENSE)
+[![npm version](https://badge.fury.io/js/eip777.svg)](https://www.npmjs.com/package/eip777)
+
 *A New Advanced Token Standard*
 
 This standard defines a new way to interact with a Token Contract. This standard takes advantage of [ERC-820](https://github.com/ethereum/EIPs/issues/820).
