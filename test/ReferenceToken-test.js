@@ -41,7 +41,7 @@ describe('EIP777 Reference Token Test', () => {
     assert.ok(tokenableContractsRegistry.$address);
 
     referenceToken = await ReferenceToken.new(web3,
-      'Reference Token', 'XRT', 18, tokenableContractsRegistry.$address);
+      'Reference Token', 'XRT', tokenableContractsRegistry.$address);
     assert.ok(referenceToken.$address);
 
     const name = await referenceToken.name();
@@ -61,7 +61,7 @@ describe('EIP777 Reference Token Test', () => {
     log(`totalSupply: ${totalSupply}`);
   }).timeout(20000);
 
-  it('should mint tokens for address 1', async () => {
+  it('should mint 10 tokens for address 1', async () => {
     blocks[0] = await web3.eth.getBlockNumber();
     log(`block 0 -> ${blocks[0]}`);
 
