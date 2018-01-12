@@ -7,7 +7,6 @@ interface Ierc777 {
     function totalSupply() public constant returns (uint256);
     function decimals() public constant returns (uint8);
     function balanceOf(address owner) public constant returns (uint256);
-    function erc20compatible() public constant returns (bool);
 
     function send(address to, uint256 amount) public;
     function send(address to, uint256 amount, bytes userData) public;
