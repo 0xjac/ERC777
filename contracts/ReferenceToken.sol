@@ -18,7 +18,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
     string private mName;
     string private mSymbol;
-    uint8  private mDecimals;
+    uint256 private mMinimalUnit;
     uint256 private mTotalSupply;
 
     bool private mErc20compatible;
@@ -34,18 +34,24 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         _;
     }
 
+    function requireMultiple(uint256 _value) internal {
+        require(_value.div(mMinimalUnit).mul(mMinimalUnit) == _value);
+    }
+
     function ReferenceToken(
         string _name,
         string _symbol,
+        uint256 _minimalUnit,
         TokenableContractsRegistry _tokenableContractsRegistry
     )
         public
     {
         mName = _name;
         mSymbol = _symbol;
-        mDecimals = 18;
         mTotalSupply = 0;
         mErc20compatible = true;
+        require(_minimalUnit >= 1);
+        mMinimalUnit = _minimalUnit;
 
         tokenableContractsRegistry = _tokenableContractsRegistry;
         setInterfaceImplementation("Ierc777", this);
@@ -56,10 +62,13 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     function name() public constant returns (string) { return mName; }
     /** @notice Return the symbol of the token */
     function symbol() public constant returns(string) { return mSymbol; }
-    /** @notice Return the number of decimals the token uses */
-    function decimals() public constant returns(uint8) { return mDecimals; }
+    /** @notice Return the non divisible minimal partition of the token */
+    function minimalUnit() public constant returns(uint256) { return mMinimalUnit; }
     /** @notice Return the Total token supply */
     function totalSupply() public constant returns(uint256) { return mTotalSupply; }
+
+    /** For Backwards compatibility */
+    function decimals() public erc20 constant returns (uint8) { return uint8(18); }
 
     /**
      * @notice Return the account balance of some account
@@ -147,6 +156,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
     /** @notice Sample burn function to showcase the use of the 'Burn' event. */
     function burn(address _tokenHolder, uint256 _value) public onlyOwner returns(bool) {
+        requireMultiple(_value);
         require(balanceOf(_tokenHolder) >= _value);
 
         mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
@@ -160,6 +170,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
     /** @notice Sample mint function to showcase the use of the 'Mint' event and the logic to notify the recipient. */
     function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
+        requireMultiple(_value);
         mTotalSupply = mTotalSupply.add(_value);
         mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_value);
 
@@ -197,8 +208,8 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     )
         private
     {
+        requireMultiple(_value);
         require(_to != address(0));         // forbid sending to 0x0 (=burning)
-        require(_value >= 0);                // only send positive amounts
         require(mBalances[_from] >= _value); // ensure enough funds
 
         mBalances[_from] = mBalances[_from].sub(_value);

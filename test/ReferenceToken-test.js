@@ -45,7 +45,7 @@ describe('EIP777 Reference Token Test', () => {
     assert.ok(tokenableContractsRegistry.$address);
 
     referenceToken = await ReferenceToken.new(web3,
-      'Reference Token', 'XRT', tokenableContractsRegistry.$address);
+      'Reference Token', 'XRT', web3.utils.toWei("0.01"), tokenableContractsRegistry.$address);
     assert.ok(referenceToken.$address);
 
     const name = await referenceToken.name();
@@ -56,9 +56,9 @@ describe('EIP777 Reference Token Test', () => {
     assert.strictEqual(symbol, 'XRT');
     log(`symbol: ${symbol}`);
 
-    const decimals = await referenceToken.decimals();
-    assert.strictEqual(decimals, '18');
-    log(`decimals: ${decimals}`);
+    const minimalUnit = await referenceToken.minimalUnit();
+    assert.strictEqual(web3.utils.fromWei(minimalUnit), '0.01');
+    log(`minimalUnit: ${minimalUnit}`);
 
     const totalSupply = await referenceToken.totalSupply();
     assert.strictEqual(totalSupply, '0');
@@ -69,7 +69,7 @@ describe('EIP777 Reference Token Test', () => {
     blocks[0] = await web3.eth.getBlockNumber();
     log(`block 0 -> ${blocks[0]}`);
 
-    await referenceToken.ownerMint(accounts[1], 10, '0x', {
+    await referenceToken.ownerMint(accounts[1], web3.utils.toWei("10"), '0x', {
       gas: 300000,
       from: accounts[0]
     });
@@ -78,11 +78,11 @@ describe('EIP777 Reference Token Test', () => {
     log(`block 1 -> ${blocks[1]}`);
 
     const totalSupply = await referenceToken.totalSupply();
-    assert.equal(totalSupply, 10);
+    assert.equal(web3.utils.fromWei(totalSupply), 10);
     log(`totalSupply: ${totalSupply}`);
 
     const balance = await referenceToken.balanceOf(accounts[1]);
-    assert.equal(balance, 10);
+    assert.equal(web3.utils.fromWei(balance), 10);
     log(`balance[${accounts[1]}]: ${balance}`);
   }).timeout(6000);
 });
