@@ -56,9 +56,9 @@ describe('EIP777 Reference Token Test', () => {
     assert.strictEqual(symbol, 'XRT');
     log(`symbol: ${symbol}`);
 
-    const minimalUnit = await referenceToken.minimalUnit();
-    assert.strictEqual(web3.utils.fromWei(minimalUnit), '0.01');
-    log(`minimalUnit: ${minimalUnit}`);
+    const granularity = await referenceToken.granularity();
+    assert.strictEqual(web3.utils.fromWei(granularity), '0.01');
+    log(`minimalUnit: ${granularity}`);
 
     const totalSupply = await referenceToken.totalSupply();
     assert.strictEqual(totalSupply, '0');

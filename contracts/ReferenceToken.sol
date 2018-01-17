@@ -18,7 +18,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
     string private mName;
     string private mSymbol;
-    uint256 private mMinimalUnit;
+    uint256 private mGranularity;
     uint256 private mTotalSupply;
 
     bool private mErc20compatible;
@@ -35,13 +35,13 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     }
 
     function requireMultiple(uint256 _value) internal {
-        require(_value.div(mMinimalUnit).mul(mMinimalUnit) == _value);
+        require(_value.div(mGranularity).mul(mGranularity) == _value);
     }
 
     function ReferenceToken(
         string _name,
         string _symbol,
-        uint256 _minimalUnit,
+        uint256 _granularity,
         TokenableContractsRegistry _tokenableContractsRegistry
     )
         public
@@ -50,8 +50,8 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         mSymbol = _symbol;
         mTotalSupply = 0;
         mErc20compatible = true;
-        require(_minimalUnit >= 1);
-        mMinimalUnit = _minimalUnit;
+        require(_granularity >= 1);
+        mGranularity = _granularity;
 
         tokenableContractsRegistry = _tokenableContractsRegistry;
         setInterfaceImplementation("Ierc777", this);
@@ -63,7 +63,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     /** @notice Return the symbol of the token */
     function symbol() public constant returns(string) { return mSymbol; }
     /** @notice Return the non divisible minimal partition of the token */
-    function minimalUnit() public constant returns(uint256) { return mMinimalUnit; }
+    function granularity() public constant returns(uint256) { return mGranularity; }
     /** @notice Return the Total token supply */
     function totalSupply() public constant returns(uint256) { return mTotalSupply; }
 
