@@ -8,7 +8,7 @@ interface Ierc777 {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
     function totalSupply() public constant returns (uint256);
-    function minimalUnit() public constant returns (uint256);
+    function granularity() public constant returns (uint256);
     function balanceOf(address owner) public constant returns (uint256);
 
     function send(address to, uint256 amount) public;
