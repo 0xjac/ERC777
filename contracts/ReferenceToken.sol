@@ -34,10 +34,6 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         _;
     }
 
-    function requireMultiple(uint256 _value) internal {
-        require(_value.div(mGranularity).mul(mGranularity) == _value);
-    }
-
     function ReferenceToken(
         string _name,
         string _symbol,
@@ -182,6 +178,8 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         return true;
     }
 
+    function requireMultiple(uint256 _value) internal { require(_value.div(mGranularity).mul(mGranularity) == _value); }
+
     /** @notice Check whether a contrat address registered with the Tokenable Contract Registry to receive tokens*/
     function isTokenable(address _addr) internal constant returns(bool) {
         if (address(tokenableContractsRegistry) == 0x0) return false;
@@ -209,7 +207,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         private
     {
         requireMultiple(_value);
-        require(_to != address(0));         // forbid sending to 0x0 (=burning)
+        require(_to != address(0));          // forbid sending to 0x0 (=burning)
         require(mBalances[_from] >= _value); // ensure enough funds
 
         mBalances[_from] = mBalances[_from].sub(_value);
