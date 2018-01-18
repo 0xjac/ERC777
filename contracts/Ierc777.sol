@@ -20,7 +20,7 @@ interface Ierc777 {
     function isOperatorFor(address operator, address tokenHolder) public constant returns (bool);
     function operatorSend(address from, address to, uint256 amount, bytes userData, bytes operatorData) public;
 
-    event Send( // solhint-disable-line no-simple-event-func-name
+    event Sent( // solhint-disable-line no-simple-event-func-name
         address indexed from,
         address indexed to,
         uint256 amount,
