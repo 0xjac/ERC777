@@ -215,7 +215,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
         callRecipent(_from, _to, _value, _userData, _operator, _operatorData, _preventLocking);
 
-        Send(_from, _to, _value, _userData, _operator, _operatorData);
+        Sent(_from, _to, _value, _userData, _operator, _operatorData);
         if (mErc20compatible) { Transfer(_from, _to, _value); }
     }
 
