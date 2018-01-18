@@ -58,7 +58,7 @@ describe('EIP777 Reference Token Test', () => {
 
     const granularity = await referenceToken.granularity();
     assert.strictEqual(web3.utils.fromWei(granularity), '0.01');
-    log(`minimalUnit: ${granularity}`);
+    log(`granularity: ${granularity}`);
 
     const totalSupply = await referenceToken.totalSupply();
     assert.strictEqual(totalSupply, '0');

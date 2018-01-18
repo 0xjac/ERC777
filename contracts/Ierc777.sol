@@ -4,6 +4,7 @@
 
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
+
 interface Ierc777 {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
