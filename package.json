@@ -47,14 +47,23 @@
   },
   "homepage": "https://github.com/jacquesd/eip777#readme",
   "dependencies": {
+    "chai-as-promised": "^7.1.1",
     "eip820": "0.0.11",
     "giveth-common-contracts": "^0.4.0",
+    "jshint-esnext": "^2.7.0-3",
     "solcpiler": "0.0.11",
     "web3": "^1.0.0-beta.27"
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
     "ethereumjs-testrpc": "git://github.com/jbaylina/testrpc.git",
-    "mocha": "^4.1.0"
+    "mocha": "^4.1.0",
+    "solidity-coverage": "^0.4.8"
   }
 }
