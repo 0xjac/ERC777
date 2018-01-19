@@ -158,13 +158,13 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
         mTotalSupply = mTotalSupply.sub(_value);
 
-        Burn(_tokenHolder, _value);
+        Burnt(_tokenHolder, _value);
         if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
 
         return true;
     }
 
-    /** @notice Sample mint function to showcase the use of the 'Mint' event and the logic to notify the recipient. */
+    /** @notice Sample mint function to showcase the use of the 'Minted' event and the logic to notify the recipient. */
     function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
         requireMultiple(_value);
         mTotalSupply = mTotalSupply.add(_value);
@@ -172,7 +172,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
         callRecipent(0x0, _tokenHolder, _value, "", msg.sender, _operatorData, true);
 
-        Mint(_tokenHolder, _value, msg.sender, _operatorData);
+        Minted(_tokenHolder, _value, msg.sender, _operatorData);
         if (mErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
 
         return true;
