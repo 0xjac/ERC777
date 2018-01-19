@@ -8,11 +8,8 @@ const chai = require('chai');
 const EIP820 = require('eip820');
 const TokenableContractsRegistry = require('../js/TokenableContractsRegistry');
 const ReferenceToken = require('../js/ReferenceToken');
-
 const assert = chai.assert;
-const { utils } = Web3;
-const log = (msg) => { if (process.env.MOCHA_VERBOSE) console.log(msg); };
-const blocks = [];
+chai.use(require('chai-as-promised')).should();
 
 describe('EIP777 Reference Token Test', () => {
   let testrpc;
@@ -21,12 +18,13 @@ describe('EIP777 Reference Token Test', () => {
   let referenceToken;
   let tokenableContractsRegistry;
   let interfaceImplementationRegistry;
+  let util;
 
   before(async () => {
     testrpc = TestRPC.server({
       ws: true,
       gasLimit: 5800000,
-      total_accounts: 10,
+      total_accounts: 10, // eslint-disable-line camelcase
     });
     testrpc.listen(8546, '127.0.0.1');
 
@@ -37,52 +35,190 @@ describe('EIP777 Reference Token Test', () => {
     assert.ok(interfaceImplementationRegistry.$address);
   });
 
-  after(async () => await testrpc.close());
+  after(async () => testrpc.close());
 
   it('should deploy the reference token contract', async () => {
-
     tokenableContractsRegistry = await TokenableContractsRegistry.new(web3);
     assert.ok(tokenableContractsRegistry.$address);
 
-    referenceToken = await ReferenceToken.new(web3,
-      'Reference Token', 'XRT', web3.utils.toWei("0.01"), tokenableContractsRegistry.$address);
+    referenceToken = await ReferenceToken.new(
+      web3,
+      'Reference Token',
+      'XRT',
+      web3.utils.toWei('0.01'),
+      tokenableContractsRegistry.$address
+    );
     assert.ok(referenceToken.$address);
+
+    util = require('./util')(web3, referenceToken);
+    await util.getBlock();
 
     const name = await referenceToken.name();
     assert.strictEqual(name, 'Reference Token');
-    log(`name: ${name}`);
+    await util.log(`name: ${name}`);
 
     const symbol = await referenceToken.symbol();
     assert.strictEqual(symbol, 'XRT');
-    log(`symbol: ${symbol}`);
+    await util.log(`symbol: ${symbol}`);
 
     const granularity = await referenceToken.granularity();
     assert.strictEqual(web3.utils.fromWei(granularity), '0.01');
-    log(`granularity: ${granularity}`);
+    await util.log(`granularity: ${granularity}`);
 
-    const totalSupply = await referenceToken.totalSupply();
-    assert.strictEqual(totalSupply, '0');
-    log(`totalSupply: ${totalSupply}`);
+    await util.assertTotalSupply(0);
   }).timeout(20000);
 
-  it('should mint 10 tokens for address 1', async () => {
-    blocks[0] = await web3.eth.getBlockNumber();
-    log(`block 0 -> ${blocks[0]}`);
-
-    await referenceToken.ownerMint(accounts[1], web3.utils.toWei("10"), '0x', {
+  it('should mint 10 XRT for addr 1', async () => {
+    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('10'), '0x', {
       gas: 300000,
-      from: accounts[0]
+      from: accounts[0],
     });
+    await util.getBlock();
 
-    blocks[1] = await web3.eth.getBlockNumber();
-    log(`block 1 -> ${blocks[1]}`);
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 10);
+  }).timeout(6000);
 
-    const totalSupply = await referenceToken.totalSupply();
-    assert.equal(web3.utils.fromWei(totalSupply), 10);
-    log(`totalSupply: ${totalSupply}`);
+  it('should not mint -10 XRT (negative value)', async () => {
+    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('-10'), '0x', {
+      gas: 300000,
+      from: accounts[0],
+    }).should.be.rejectedWith('invalid opcode');
+    await util.getBlock();
 
-    const balance = await referenceToken.balanceOf(accounts[1]);
-    assert.equal(web3.utils.fromWei(balance), 10);
-    log(`balance[${accounts[1]}]: ${balance}`);
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 10);
+  }).timeout(6000);
+
+  it('should let addr 1 send 3 XRT to addr 2', async () => {
+    await referenceToken.send(accounts[2], web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[1],
+    });
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 7);
+    await util.assertBalance(accounts[2], 3);
+  }).timeout(6000);
+
+  it('should not let addr 1 send 9 XRT (not enough funds)', async () => {
+    await referenceToken.send(accounts[2], web3.utils.toWei('9'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 7);
+    await util.assertBalance(accounts[2], 3);
+  });
+
+  it('should not let addr 1 send -3 XRT (negative value)', async () => {
+    await referenceToken.send(accounts[2], web3.utils.toWei('-3'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 7);
+    await util.assertBalance(accounts[2], 3);
+  }).timeout(6000);
+
+  it('should not let addr 1 send 0.007 XRT (< granulairty)', async () => {
+    await referenceToken.send(accounts[2], web3.utils.toWei('0.007'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 7);
+    await util.assertBalance(accounts[2], 3);
+  }).timeout(6000);
+
+  it('should authorize addr 3 as an operator for addr 1', async () => {
+    assert.isFalse(
+      await referenceToken.isOperatorFor(accounts[3], accounts[1])
+    );
+    await referenceToken.authorizeOperator(accounts[3], {
+      from: accounts[1],
+      gas: 300000,
+    });
+    await util.getBlock();
+    assert.isTrue(await referenceToken.isOperatorFor(accounts[3], accounts[1]));
+  }).timeout(6000);
+
+  it('should let addr 3 send from addr 1', async () => {
+    await referenceToken.operatorSend(
+      accounts[1],
+      accounts[2],
+      web3.utils.toWei('1.12'),
+      '0x',
+      '0x',
+      { gas: 300000, from: accounts[3] }
+    );
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 5.88);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('should revoke addr 3 as an operator for addr 1', async () => {
+    assert.isTrue(await referenceToken.isOperatorFor(accounts[3], accounts[1]));
+    await referenceToken.revokeOperator(accounts[3], {
+      from: accounts[1],
+      gas: 300000,
+    });
+    await util.getBlock();
+
+    assert.isFalse(
+      await referenceToken.isOperatorFor(accounts[3], accounts[1])
+    );
+  }).timeout(6000);
+
+  it('should not let addr 3 send from addr 1 (not operator)', async () => {
+    await referenceToken.operatorSend(
+      accounts[1],
+      accounts[2],
+      web3.utils.toWei('3.72'),
+      '0x',
+      '0x',
+      { gas: 300000, from: accounts[3] }
+    ).should.be.rejectedWith('invalid opcode');
+    await util.getBlock();
+
+    await util.assertTotalSupply(10);
+    await util.assertBalance(accounts[1], 5.88);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('should burn 1.35 XRT from addr 1', async () => {
+    await referenceToken.burn(accounts[1], web3.utils.toWei('1.35'), {
+      from: accounts[0],
+      gas: 300000,
+    });
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 4.53);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('should not burn -3.84 XRT (negative value)', async () => {
+    await referenceToken.burn(accounts[1], web3.utils.toWei('-3.84'), {
+      from: accounts[0],
+      gas: 300000,
+    }).should.be.rejectedWith('invalid opcode');
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 4.53);
+    await util.assertBalance(accounts[2], 4.12);
   }).timeout(6000);
 });
