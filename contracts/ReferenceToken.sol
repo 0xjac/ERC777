@@ -91,7 +91,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
     /// @notice Return the account balance of some account
     /// @param _tokenHolder Address for whith to return the balance
-    /// @returns the balance of `_tokenAddress`.
+    /// @return the balance of `_tokenAddress`.
     function balanceOf(address _tokenHolder) public constant returns (uint256) {
         return mBalances[_tokenHolder];
     }
