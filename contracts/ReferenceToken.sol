@@ -2,6 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/// @title ERC777 ReferenceToken Contract
+/// @author Jordi Baylina, Jacques Dafflon
+/// @dev This token contract's goal is to give an example implementation
+///  of ERC777 with ERC20 compatible.
+///  This contract does not define any standard, but can be taken as a reference
+///  implementation in case of any ambiguity into the standard
+
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "../node_modules/eip820/contracts/EIP820.sol";
@@ -29,11 +36,23 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     mapping(address => mapping(address => bool)) private mAuthorized;
     mapping(address => mapping(address => uint256)) private mAllowed;
 
+    /// @notice This modifier is applied to erc20 obsolete methods that are
+    ///  implemented only to maintain backwards compatibility. When the erc20
+    ///  compatibility is dissabled, this methods will fail.
     modifier erc20 () {
         require(mErc20compatible);
         _;
     }
 
+    /// @notice Constructor to create a ReferenceToken
+    /// @param _name Name of the new token
+    /// @param _symbol Symbol of the new token.
+    /// @param _granularity Minimum transferable chunk.
+    /// @param _tokenableContractsRegistry A registry contract with a single
+    ///  method `isTokenable(address contract)` that returns true if a spefiic
+    ///  old `contract` supports holding tokens by default without the need of
+    ///  implementing `ITokenRecipient`.  This paramete can be 0x0 if this
+    ///  functionality does not want to be used.
     function ReferenceToken(
         string _name,
         string _symbol,
@@ -54,46 +73,57 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         setInterfaceImplementation("Ierc20", this);
     }
 
-    /** @notice Return the name of the token */
+    /// @return the name of the token
     function name() public constant returns (string) { return mName; }
-    /** @notice Return the symbol of the token */
+
+    /// @return the symbol of the token
     function symbol() public constant returns(string) { return mSymbol; }
-    /** @notice Return the non divisible minimal partition of the token */
+
+    /// @return the granularity of the token
     function granularity() public constant returns(uint256) { return mGranularity; }
-    /** @notice Return the Total token supply */
+
+    /// @return the total supply of the token
     function totalSupply() public constant returns(uint256) { return mTotalSupply; }
 
-    /** For Backwards compatibility */
+    /// @notice For Backwards compatibility
+    /// @return The decimls of the token. Forced to 18 in ERC777.
     function decimals() public erc20 constant returns (uint8) { return uint8(18); }
 
-    /**
-     * @notice Return the account balance of some account
-     *
-     * @param _tokenHolder Address for whith to return the balance
-     */
+    /// @notice Return the account balance of some account
+    /// @param _tokenHolder Address for whith to return the balance
+    /// @returns the balance of `_tokenAddress`.
     function balanceOf(address _tokenHolder) public constant returns (uint256) {
         return mBalances[_tokenHolder];
     }
 
-    /** @notice Disable the ERC-20 interface */
+    /// @notice Disables the ERC-20 interface. This function can only be called
+    ///  by the owner.
     function disableERC20() public onlyOwner {
         mErc20compatible = false;
         setInterfaceImplementation("Ierc20", 0x0);
     }
 
-    /** @notice Enable the ERC-20 interface */
+    /// @notice Re enables the ERC-20 interface. This function can only be called
+    ///  by the owner.
     function enableERC20() public onlyOwner {
         mErc20compatible = true;
         setInterfaceImplementation("Ierc20", this);
     }
 
-    /** @notice ERC-20 transfer */
+    /// @notice ERC20 backwards compatible transfer.
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @return `true` If the transfer can't be done, it should fail.
     function transfer(address _to, uint256 _value) public erc20 returns (bool success) {
         doSend(msg.sender, _to, _value, "", msg.sender, "", false);
         return true;
     }
 
-    /** @notice ERC-20 transferFrom */
+    /// @notice ERC20 backwards compatible transferFrom.
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @return `true` If the transfer can't be done, it should fail.
     function transferFrom(address _from, address _to, uint256 _value) public erc20 returns (bool success) {
         require(_value <= mAllowed[_from][msg.sender]);
 
@@ -103,55 +133,83 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         return true;
     }
 
-    /** @notice ERC-20 approve */
+    /// @notice ERC20 backwards compatible approve.
+    ///  `msg.sender` approves `_spender` to spend `_value` tokens on
+    ///  its behalf.
+    /// @param _spender The address of the account able to transfer the tokens
+    /// @param _value The amount of tokens to be approved for transfer
+    /// @return `true` If the approve can't be done, it should fail.
     function approve(address _spender, uint256 _value) public erc20 returns (bool success) {
         mAllowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    /** @notice ERC-20 allowance */
+    /// @notice ERC20 backwards compatible allowance.
+    ///  This function makes it easy to read the `allowed[]` map
+    /// @param _owner The address of the account that owns the token
+    /// @param _spender The address of the account able to transfer the tokens
+    /// @return Amount of remaining tokens of _owner that _spender is allowed
+    ///  to spend
     function allowance(address _owner, address _spender) public erc20 constant returns (uint256 remaining) {
         return mAllowed[_owner][_spender];
     }
 
-    /** @notice Send '_value' amount of tokens to address '_to'. */
+    /// @notice Send `_value`tokens to `_to`
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
     function send(address _to, uint256 _value) public {
         doSend(msg.sender, _to, _value, "", msg.sender, "", true);
     }
 
-    /** @notice Send '_value' amount of tokens to address '_to'. */
+    /// @notice Send `_value`tokens to `_to` passing `_userData` to the recipient
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
     function send(address _to, uint256 _value, bytes _userData) public {
         doSend(msg.sender, _to, _value, _userData, msg.sender, "", true);
     }
 
-    /** @notice Authorize a third party '_operator' to manage (send) 'msg.sender''s tokens. */
+    /// @notice Authorize a third party '_operator' to manage (send) 'msg.sender''s tokens.
+    /// @param _operator The operator that wants to be Authorized
     function authorizeOperator(address _operator) public {
         require(_operator != msg.sender);
         mAuthorized[_operator][msg.sender] = true;
         AuthorizedOperator(_operator, msg.sender);
     }
 
-    /** @notice Revoke a third party '_operator''s rights to manage (send) 'msg.sender''s tokens. */
+    /// @notice Revoke a third party '_operator''s rights to manage (send) 'msg.sender''s tokens.
+    /// @param _operator The operator that wants to be Revoked
     function revokeOperator(address _operator) public {
         require(_operator != msg.sender);
         mAuthorized[_operator][msg.sender] = false;
         RevokedOperator(_operator, msg.sender);
     }
 
-    /** @notice Check whether '_operator' is allowed to manage the tokens held by '_tokenHolder'. */
+    /// @notice Check whether '_operator' is allowed to manage the tokens held by '_tokenHolder'.
+    /// @param _operator operators address that wants to be queried for
+    /// @param _tokenHolder tokenholder addres that wants to be queried
+    /// @return `true` if `_operator` is authorized for `_tokenHolder`
     function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
         return _operator == _tokenHolder || mAuthorized[_operator][_tokenHolder];
     }
 
-    /** @notice Send '_value' amount of tokens from the address '_from' to the address '_to'. */
+    /// @notice Send method user for the operators to send tokens in behalf of the `_from`
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @param _userData Data generated by the user to be sent to the recipient
+    /// @param _operatorData Data generated by the operator to be sent to the recipient
     function operatorSend(address _from, address _to, uint256 _value, bytes _userData, bytes _operatorData) public {
         require(isOperatorFor(msg.sender, _from));
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData, true);
     }
 
-    /** @notice Sample burn function to showcase the use of the 'Burn' event. */
-    function burn(address _tokenHolder, uint256 _value) public onlyOwner returns(bool) {
+    /// @notice Burns `_value` tokens from `_tokenHolder`
+    ///  Sample burn function to showcase the use of the `Burnt` event.
+    /// @param _tokenHolder The address that will lose the tokens
+    /// @param _value The quantity of tokens to burn
+    /// @return True if the tokens are burned correctly
+    function burn(address _tokenHolder, uint256 _value) public onlyOwner {
         requireMultiple(_value);
         require(balanceOf(_tokenHolder) >= _value);
 
@@ -160,12 +218,15 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
         Burnt(_tokenHolder, _value);
         if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
-
-        return true;
     }
 
-    /** @notice Sample mint function to showcase the use of the 'Minted' event and the logic to notify the recipient. */
-    function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner returns(bool) {
+    /// @notice Generates `_value` tokens that are assigned to `_tokenHolder`
+    ///  Sample mint function to showcase the use of the `Minted` event
+    ///  and the logic to notify the recipient.
+    /// @param _tokenHolder The address that will be assigned the new tokens
+    /// @param _value The quantity of tokens generated
+    /// @param _operatorData Data that will be passed to the recipient as a first transfer
+    function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner {
         requireMultiple(_value);
         mTotalSupply = mTotalSupply.add(_value);
         mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_value);
@@ -174,19 +235,29 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
 
         Minted(_tokenHolder, _value, msg.sender, _operatorData);
         if (mErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
-
-        return true;
     }
 
-    function requireMultiple(uint256 _value) internal { require(_value.div(mGranularity).mul(mGranularity) == _value); }
 
-    /** @notice Check whether a contrat address registered with the Tokenable Contract Registry to receive tokens*/
+    /// @notice internal function that waranties that `_value` is multiple of the
+    ///  granularity defined for this token
+    /// @param _value The quantity that want's to be checked
+    function requireMultiple(uint256 _value) internal {
+        require(_value.div(mGranularity).mul(mGranularity) == _value);
+    }
+
+    /// @notice Helper function to check whether a contrat address registered with the
+    ///   Tokenable Contract Registry to receive tokens
+    /// @param _addr Address of the contract that wants to be checked
+    /// @return `true` id _addr is in the white list of old contracts that can accept
+    ///  tokens without the need of implementing `ITokenRecipient`
     function isTokenable(address _addr) internal constant returns(bool) {
         if (address(tokenableContractsRegistry) == 0x0) return false;
         return tokenableContractsRegistry.isTokenable(_addr);
     }
 
-    /** @notice Check whether an address is a regular address or not. */
+    /// @notice Check whether an address is a regular address or not. */
+    /// @param _addr Address of the contract that wants to be checked
+    /// @return `true` if `_addr` is a regular address (is not a contract)
     function isRegularAddress(address _addr) internal constant returns(bool) {
         if (_addr == 0) { return false; }
         uint size;
@@ -194,7 +265,16 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         return size == 0;
     }
 
-    /** @dev Perform an actual send of tokens. */
+    /// @notice Helper function that actually perform an actual send of tokens.
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @param _userData Data generated by the user to be sent to the recipient
+    /// @param _operatorData Data generated by the operator to be sent to the recipient
+    /// @param _preventLocking `true` if you want this function to throw when tokens are sended to
+    /// a contract that does not implement `ITokenRecipient` and the contract is not whitelisted in
+    ///  tokenableContractsRegistry.  ERC777 native Send functions should set this parameter to true,
+    ///  and backwards compatible ERC20 transfer functions shuld set this parameter to false.
     function doSend(
         address _from,
         address _to,
@@ -219,7 +299,17 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         if (mErc20compatible) { Transfer(_from, _to, _value); }
     }
 
-    /** @dev Notify a recipient of received tokens. */
+    /// @notice Helper function that checks for ITokenRecipient on the recipient and
+    ///  cals it.  Throwin according to `_preventLocking`
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @param _userData Data generated by the user to be sent to the recipient
+    /// @param _operatorData Data generated by the operator to be sent to the recipient
+    /// @param _preventLocking `true` if you want this function to throw when tokens are sended to
+    /// a contract that does not implement `ITokenRecipient` and the contract is not whitelisted in
+    ///  tokenableContractsRegistry.  ERC777 native Send functions should set this parameter to true,
+    ///  and backwards compatible ERC20 transfer functions shuld set this parameter to false.
     function callRecipent(
         address _from,
         address _to,
