@@ -69,7 +69,7 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(20000);
 
   it('should mint 10 XRT for addr 1', async () => {
-    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('10'), '0x', {
+    await referenceToken.mint(accounts[1], web3.utils.toWei('10'), '0x', {
       gas: 300000,
       from: accounts[0],
     });
@@ -80,7 +80,7 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not mint -10 XRT (negative value)', async () => {
-    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('-10'), '0x', {
+    await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
       gas: 300000,
       from: accounts[0],
     }).should.be.rejectedWith('invalid opcode');
