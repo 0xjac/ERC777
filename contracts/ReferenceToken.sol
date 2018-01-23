@@ -36,13 +36,10 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     mapping(address => mapping(address => bool)) private mAuthorized;
     mapping(address => mapping(address => uint256)) private mAllowed;
 
-    /// @notice This modifier is applied to erc20 obsolete methods that are
-    ///  implemented only to maintain backwards compatibility. When the erc20
-    ///  compatibility is disabled, this methods will fail.
-    modifier erc20 () {
-        require(mErc20compatible);
-        _;
-    }
+
+//////////////////////////////////
+// Constructor
+//////////////////////////////////
 
     /// @notice Constructor to create a ReferenceToken
     /// @param _name Name of the new token
@@ -71,6 +68,11 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         setInterfaceImplementation("Ierc20", this);
     }
 
+
+//////////////////////////////////
+// ERC777 Interface implementation
+//////////////////////////////////
+
     /// @return the name of the token
     function name() public constant returns (string) { return mName; }
 
@@ -83,10 +85,6 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     /// @return the total supply of the token
     function totalSupply() public constant returns(uint256) { return mTotalSupply; }
 
-    /// @notice For Backwards compatibility
-    /// @return The decimls of the token. Forced to 18 in ERC777.
-    function decimals() public erc20 constant returns (uint8) { return uint8(18); }
-
     /// @notice Return the account balance of some account
     /// @param _tokenHolder Address for which the balance is returned
     /// @return the balance of `_tokenAddress`.
@@ -94,63 +92,6 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         return mBalances[_tokenHolder];
     }
 
-    /// @notice Disables the ERC-20 interface. This function can only be called
-    ///  by the owner.
-    function disableERC20() public onlyOwner {
-        mErc20compatible = false;
-        setInterfaceImplementation("Ierc20", 0x0);
-    }
-
-    /// @notice Re enables the ERC-20 interface. This function can only be called
-    ///  by the owner.
-    function enableERC20() public onlyOwner {
-        mErc20compatible = true;
-        setInterfaceImplementation("Ierc20", this);
-    }
-
-    /// @notice ERC20 backwards compatible transfer.
-    /// @param _to The address of the recipient
-    /// @param _value The amount of tokens to be transferred
-    /// @return `true`, if the transfer can't be done, it should fail.
-    function transfer(address _to, uint256 _value) public erc20 returns (bool success) {
-        doSend(msg.sender, _to, _value, "", msg.sender, "", false);
-        return true;
-    }
-
-    /// @notice ERC20 backwards compatible transferFrom.
-    /// @param _from The address holding the tokens being transferred
-    /// @param _to The address of the recipient
-    /// @param _value The amount of tokens to be transferred
-    /// @return `true`, if the transfer can't be done, it should fail.
-    function transferFrom(address _from, address _to, uint256 _value) public erc20 returns (bool success) {
-        require(_value <= mAllowed[_from][msg.sender]);
-
-        // Cannot be after doSend because of tokensReceived re-entry
-        mAllowed[_from][msg.sender] = mAllowed[_from][msg.sender].sub(_value);
-        doSend(_from, _to, _value, "", msg.sender, "", false);
-        return true;
-    }
-
-    /// @notice ERC20 backwards compatible approve.
-    ///  `msg.sender` approves `_spender` to spend `_value` tokens on its behalf.
-    /// @param _spender The address of the account able to transfer the tokens
-    /// @param _value The amount of tokens to be approved for transfer
-    /// @return `true`, if the approve can't be done, it should fail.
-    function approve(address _spender, uint256 _value) public erc20 returns (bool success) {
-        mAllowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
-        return true;
-    }
-
-    /// @notice ERC20 backwards compatible allowance.
-    ///  This function makes it easy to read the `allowed[]` map
-    /// @param _owner The address of the account that owns the token
-    /// @param _spender The address of the account able to transfer the tokens
-    /// @return Amount of remaining tokens of _owner that _spender is allowed
-    ///  to spend
-    function allowance(address _owner, address _spender) public erc20 constant returns (uint256 remaining) {
-        return mAllowed[_owner][_spender];
-    }
 
     /// @notice Send `_value` amount of tokens to address `_to`
     /// @param _to The address of the recipient
@@ -201,27 +142,17 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         doSend(_from, _to, _value, _userData, msg.sender, _operatorData, true);
     }
 
-    /// @notice Burns `_value` tokens from `_tokenHolder`
-    ///  Sample burn function to showcase the use of the `Burned` event.
-    /// @param _tokenHolder The address that will lose the tokens
-    /// @param _value The quantity of tokens to burn
-    function burn(address _tokenHolder, uint256 _value) public onlyOwner {
-        requireMultiple(_value);
-        require(balanceOf(_tokenHolder) >= _value);
 
-        mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
-        mTotalSupply = mTotalSupply.sub(_value);
-
-        Burned(_tokenHolder, _value);
-        if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
-    }
+//////////////////////////////////
+// Mint and burn functions (not in ERC777 standard, only the Events)
+//////////////////////////////////
 
     /// @notice Generates `_value` tokens to be assigned to `_tokenHolder`
     ///  Sample mint function to showcase the use of the `Minted` event and the logic to notify the recipient.
     /// @param _tokenHolder The address that will be assigned the new tokens
     /// @param _value The quantity of tokens generated
     /// @param _operatorData Data that will be passed to the recipient as a first transfer
-    function ownerMint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner {
+    function mint(address _tokenHolder, uint256 _value, bytes _operatorData) public onlyOwner {
         requireMultiple(_value);
         mTotalSupply = mTotalSupply.add(_value);
         mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_value);
@@ -231,6 +162,26 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         Minted(_tokenHolder, _value, msg.sender, _operatorData);
         if (mErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
     }
+
+    /// @notice Burns `_value` tokens from `_tokenHolder`
+    ///  Sample burn function to showcase the use of the `Burnt` event.
+    /// @param _tokenHolder The address that will lose the tokens
+    /// @param _value The quantity of tokens to burn
+    function burn(address _tokenHolder, uint256 _value) public onlyOwner {
+        requireMultiple(_value);
+        require(balanceOf(_tokenHolder) >= _value);
+
+        mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
+        mTotalSupply = mTotalSupply.sub(_value);
+
+        Burnt(_tokenHolder, _value);
+        if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
+    }
+
+
+//////////////////////////////////
+// Helper Functions
+//////////////////////////////////
 
     /// @notice Internal function that ensures `_value` is multiple of the granularity
     /// @param _value The quantity that want's to be checked
@@ -319,5 +270,80 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         } else if (_preventLocking) {
             require(isRegularAddress(_to) || isTokenable(_to));
         }
+    }
+
+
+//////////////////////////////////
+// ERC20 Compatibility methodss
+//////////////////////////////////
+
+    /// @notice This modifier is applied to erc20 obsolete methods that are
+    ///  implemented only to maintain backwards compatibility. When the erc20
+    ///  compatibility is disabled, this methods will fail.
+    modifier erc20 () {
+        require(mErc20compatible);
+        _;
+    }
+
+    /// @notice Disables the ERC-20 interface. This function can only be called
+    ///  by the owner.
+    function disableERC20() public onlyOwner {
+        mErc20compatible = false;
+        setInterfaceImplementation("Ierc20", 0x0);
+    }
+
+    /// @notice Re enables the ERC-20 interface. This function can only be called
+    ///  by the owner.
+    function enableERC20() public onlyOwner {
+        mErc20compatible = true;
+        setInterfaceImplementation("Ierc20", this);
+    }
+
+    /// @notice For Backwards compatibility
+    /// @return The decimls of the token. Forced to 18 in ERC777.
+    function decimals() public erc20 constant returns (uint8) { return uint8(18); }
+
+    /// @notice ERC20 backwards compatible transfer.
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @return `true`, if the transfer can't be done, it should fail.
+    function transfer(address _to, uint256 _value) public erc20 returns (bool success) {
+        doSend(msg.sender, _to, _value, "", msg.sender, "", false);
+        return true;
+    }
+
+    /// @notice ERC20 backwards compatible transferFrom.
+    /// @param _from The address holding the tokens being transferred
+    /// @param _to The address of the recipient
+    /// @param _value The amount of tokens to be transferred
+    /// @return `true`, if the transfer can't be done, it should fail.
+    function transferFrom(address _from, address _to, uint256 _value) public erc20 returns (bool success) {
+        require(_value <= mAllowed[_from][msg.sender]);
+
+        // Cannot be after doSend because of tokensReceived re-entry
+        mAllowed[_from][msg.sender] = mAllowed[_from][msg.sender].sub(_value);
+        doSend(_from, _to, _value, "", msg.sender, "", false);
+        return true;
+    }
+
+    /// @notice ERC20 backwards compatible approve.
+    ///  `msg.sender` approves `_spender` to spend `_value` tokens on its behalf.
+    /// @param _spender The address of the account able to transfer the tokens
+    /// @param _value The amount of tokens to be approved for transfer
+    /// @return `true`, if the approve can't be done, it should fail.
+    function approve(address _spender, uint256 _value) public erc20 returns (bool success) {
+        mAllowed[msg.sender][_spender] = _value;
+        Approval(msg.sender, _spender, _value);
+        return true;
+    }
+
+    /// @notice ERC20 backwards compatible allowance.
+    ///  This function makes it easy to read the `allowed[]` map
+    /// @param _owner The address of the account that owns the token
+    /// @param _spender The address of the account able to transfer the tokens
+    /// @return Amount of remaining tokens of _owner that _spender is allowed
+    ///  to spend
+    function allowance(address _owner, address _spender) public erc20 constant returns (uint256 remaining) {
+        return mAllowed[_owner][_spender];
     }
 }
