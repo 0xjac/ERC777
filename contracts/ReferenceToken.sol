@@ -202,7 +202,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
     }
 
     /// @notice Burns `_value` tokens from `_tokenHolder`
-    ///  Sample burn function to showcase the use of the `Burnt` event.
+    ///  Sample burn function to showcase the use of the `Burned` event.
     /// @param _tokenHolder The address that will lose the tokens
     /// @param _value The quantity of tokens to burn
     function burn(address _tokenHolder, uint256 _value) public onlyOwner {
@@ -212,7 +212,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
         mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
         mTotalSupply = mTotalSupply.sub(_value);
 
-        Burnt(_tokenHolder, _value);
+        Burned(_tokenHolder, _value);
         if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
     }
 
