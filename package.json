@@ -19,6 +19,10 @@
   "scripts": {
     "test": "npm run build; mocha --harmony --exit",
     "sol-compile": "solcpiler -i './contracts/*.sol'",
+    "sol-lint": "node_modules/solhint/solhint.js --formatter stylish contracts/*.sol",
+    "js-lint": "node_modules/eslint/bin/eslint.js test/",
+    "lint": "npm run sol-lint; npm run js-lint",
+    "ci": "npm run lint && npm run test",
     "build": "npm run clean && npm run sol-compile",
     "prepare": "npm run build",
     "clean": "rm -rf ./build"
@@ -64,6 +68,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "ethereumjs-testrpc": "git://github.com/jbaylina/testrpc.git",
     "mocha": "^4.1.0",
+    "solhint": "^1.1.10",
     "solidity-coverage": "^0.4.8"
   }
 }
