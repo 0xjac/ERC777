@@ -29,7 +29,7 @@ interface Ierc777 {
         bytes operatorData
     ); // solhint-disable-next-line separate-by-one-line-in-contract
     event Minted(address indexed to, uint256 amount, address indexed operator, bytes operatorData);
-    event Burnt(address indexed from, uint256 amount);
+    event Burned(address indexed from, uint256 amount);
     // solhint-disable-next-line no-simple-event-func-name
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
