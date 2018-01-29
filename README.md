@@ -1,5 +1,5 @@
 # EIP 777
-[![Build Status](https://travis-ci.com/jacquesd/eip777.svg?token=cJXzd5ps7JqNRyB2thtp&branch=master)](https://travis-ci.com/jacquesd/eip777)
+[![Build Status](https://travis-ci.org/jacquesd/eip777.svg?branch=master)](https://travis-ci.org/jacquesd/eip777)
 [![License](https://img.shields.io/github/license/jacquesd/eip777.svg)](https://github.com/jacquesd/eip777/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/eip777.svg)](https://www.npmjs.com/package/eip777)
 
