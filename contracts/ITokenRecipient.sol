@@ -7,11 +7,11 @@ pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 interface ITokenRecipient {
     function tokensReceived(
+        address operator,
         address from,
         address to,
-        uint amount,
+        uint value,
         bytes userData,
-        address operator,
         bytes operatorData
     ) public;
 }
