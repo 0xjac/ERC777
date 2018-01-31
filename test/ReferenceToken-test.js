@@ -6,7 +6,6 @@ const TestRPC = require('ethereumjs-testrpc');
 const Web3 = require('web3');
 const chai = require('chai');
 const EIP820 = require('eip820');
-const TokenableContractsRegistry = require('../js/TokenableContractsRegistry');
 const ReferenceToken = require('../js/ReferenceToken');
 const assert = chai.assert;
 chai.use(require('chai-as-promised')).should();
@@ -16,7 +15,6 @@ describe('EIP777 Reference Token Test', () => {
   let web3;
   let accounts;
   let referenceToken;
-  let tokenableContractsRegistry;
   let interfaceImplementationRegistry;
   let util;
 
@@ -38,15 +36,11 @@ describe('EIP777 Reference Token Test', () => {
   after(async () => testrpc.close());
 
   it('should deploy the reference token contract', async () => {
-    tokenableContractsRegistry = await TokenableContractsRegistry.new(web3);
-    assert.ok(tokenableContractsRegistry.$address);
-
     referenceToken = await ReferenceToken.new(
       web3,
       'Reference Token',
       'XRT',
       web3.utils.toWei('0.01'),
-      tokenableContractsRegistry.$address
     );
     assert.ok(referenceToken.$address);
 
@@ -69,7 +63,7 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(20000);
 
   it('should mint 10 XRT for addr 1', async () => {
-    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('10'), '0x', {
+    await referenceToken.mint(accounts[1], web3.utils.toWei('10'), '0x', {
       gas: 300000,
       from: accounts[0],
     });
@@ -80,7 +74,7 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not mint -10 XRT (negative value)', async () => {
-    await referenceToken.ownerMint(accounts[1], web3.utils.toWei('-10'), '0x', {
+    await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
       gas: 300000,
       from: accounts[0],
     }).should.be.rejectedWith('invalid opcode');
