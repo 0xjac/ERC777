@@ -48,6 +48,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.getBlock();
 
     const name = await referenceToken.name();
+    console.log(name);
     assert.strictEqual(name, 'Reference Token');
     await util.log(`name: ${name}`);
 
