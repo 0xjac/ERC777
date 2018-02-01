@@ -11,7 +11,7 @@
 
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
-import "../node_modules/eip820/contracts/EIP820.sol";
+import "../node_modules/eip820/contracts/EIP820Implementer.sol";
 import "../node_modules/giveth-common-contracts/contracts/Owned.sol";
 import "../node_modules/giveth-common-contracts/contracts/SafeMath.sol";
 import "./Ierc20.sol";
@@ -19,7 +19,7 @@ import "./Ierc777.sol";
 import "./ITokenRecipient.sol";
 
 
-contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820 {
+contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     using SafeMath for uint256;
 
     string private mName;
