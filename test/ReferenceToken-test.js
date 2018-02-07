@@ -366,7 +366,7 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('ERC20 compatibility: should not let addr 3 send 1 XRT from addr 1', async () => {
-    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('1'), {
+    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('0.5'), {
       gas: 300000,
       from: accounts[3],
     }).should.be.rejectedWith('invalid opcode');
