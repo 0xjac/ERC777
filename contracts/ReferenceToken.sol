@@ -137,9 +137,9 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
         mTotalSupply = mTotalSupply.add(_value);
         mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_value);
 
-        callRecipent(0x0, _tokenHolder, _value, "", msg.sender, _operatorData, true);
+        callRecipient(msg.sender, 0x0, _tokenHolder, _value, "", _operatorData, true);
 
-        Minted(_tokenHolder, _value, msg.sender, _operatorData);
+        Minted(msg.sender, _tokenHolder, _value, _operatorData);
         if (mErc20compatible) { Transfer(0x0, _tokenHolder, _value); }
     }
 
@@ -147,14 +147,14 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     ///  Sample burn function to showcase the use of the `Burned` event.
     /// @param _tokenHolder The address that will lose the tokens
     /// @param _value The quantity of tokens to burn
-    function burn(address _tokenHolder, uint256 _value) public onlyOwner {
+    function burn(address _tokenHolder, uint256 _value, bytes _userData, bytes _operatorData) public onlyOwner {
         requireMultiple(_value);
         require(balanceOf(_tokenHolder) >= _value);
 
         mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_value);
         mTotalSupply = mTotalSupply.sub(_value);
 
-        Burned(_tokenHolder, _value);
+        Burned(msg.sender, _tokenHolder, _value, _userData, _operatorData);
         if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _value); }
     }
 
@@ -276,9 +276,9 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
         mBalances[_from] = mBalances[_from].sub(_value);
         mBalances[_to] = mBalances[_to].add(_value);
 
-        callRecipent(_from, _to, _value, _userData, _operator, _operatorData, _preventLocking);
+        callRecipient(_operator, _from, _to, _value, _userData, _operatorData, _preventLocking);
 
-        Sent(_from, _to, _value, _userData, _operator, _operatorData);
+        Sent(_operator, _from, _to, _value, _userData, _operatorData);
         if (mErc20compatible) { Transfer(_from, _to, _value); }
     }
 
@@ -293,19 +293,19 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     ///  implementing `ITokenRecipient`.
     ///  ERC777 native Send functions MUST set this parameter to `true`, and backwards compatible ERC20 transfer
     ///  functions SHOULD set this parameter to `false`.
-    function callRecipent(
+    function callRecipient(
+        address _operator,
         address _from,
         address _to,
         uint256 _value,
         bytes _userData,
-        address _operator,
         bytes _operatorData,
         bool _preventLocking
     ) private {
         address recipientImplementation = interfaceAddr(_to, "ITokenRecipient");
         if (recipientImplementation != 0) {
             ITokenRecipient(recipientImplementation).tokensReceived(
-                _from, _to, _value, _userData, _operator, _operatorData);
+                _operator, _from, _to, _value, _userData, _operatorData);
         } else if (_preventLocking) {
             require(isRegularAddress(_to));
         }

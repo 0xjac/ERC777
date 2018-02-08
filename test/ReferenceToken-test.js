@@ -194,10 +194,10 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should burn 1.35 XRT from addr 1', async () => {
-    await referenceToken.burn(accounts[1], web3.utils.toWei('1.35'), {
-      from: accounts[0],
-      gas: 300000,
-    });
+    await referenceToken.burn(
+      accounts[1], web3.utils.toWei('1.35'), '0x', '0x',
+      { from: accounts[0], gas: 300000 }
+    );
     await util.getBlock();
 
     await util.assertTotalSupply(8.65);
@@ -206,10 +206,10 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not burn -3.84 XRT (negative value)', async () => {
-    await referenceToken.burn(accounts[1], web3.utils.toWei('-3.84'), {
-      from: accounts[0],
-      gas: 300000,
-    }).should.be.rejectedWith('invalid opcode');
+    await referenceToken.burn(
+      accounts[1], web3.utils.toWei('-3.84'), '0x', '0x',
+      { from: accounts[0], gas: 300000 }
+    ).should.be.rejectedWith('invalid opcode');
     await util.getBlock();
 
     await util.assertTotalSupply(8.65);
