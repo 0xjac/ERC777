@@ -5,7 +5,7 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
-interface Ierc777 {
+interface erc777_token {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
     function totalSupply() public constant returns (uint256);

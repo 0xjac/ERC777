@@ -5,7 +5,15 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
-interface ITokenRecipient {
+interface erc777_tokenHolder {
+    function tokensToSend(
+        address operator,
+        address from,
+        address to,
+        uint value,
+        bytes userData,
+        bytes operatorData) public;
+
     function tokensReceived(
         address operator,
         address from,
