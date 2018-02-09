@@ -15,11 +15,11 @@ contract ExampleTokenRecipient is EIP820Implementer, EIP820ImplementerInterface,
     }
 
     function tokensReceived(
+        address operator,
         address from,
         address to,
         uint amount,
         bytes userData,
-        address operator,
         bytes operatorData
     )
         public
