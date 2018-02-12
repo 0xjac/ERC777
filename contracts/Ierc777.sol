@@ -15,6 +15,11 @@ interface Ierc777 {
     function send(address to, uint256 amount) public;
     function send(address to, uint256 amount, bytes userData) public;
 
+    function authorizeDelegate(address delegate, address authorizer) public;
+    function revokeDelegate(address delegate) public;
+    function delegateFor(address delegate) public constant returns (address);
+    function authorizerOf(address delegate) public constant returns (address);
+
     function authorizeOperator(address operator) public;
     function revokeOperator(address operator) public;
     function isOperatorFor(address operator, address tokenHolder) public constant returns (bool);
@@ -27,9 +32,14 @@ interface Ierc777 {
         uint256 amount,
         bytes userData,
         bytes operatorData
-    ); // solhint-disable-next-line separate-by-one-line-in-contract
+    );
+
     event Minted(address indexed operator, address indexed to, uint256 amount, bytes operatorData);
     event Burned(address indexed operator, address indexed from, uint256 amount, bytes userData, bytes operatorData);
+
+    event AuthorizedDelegate(address indexed delegate, address indexed authorizer, address indexed tokenHolder);
+    event RevokedDelegate(address indexed delegate, address indexed authorizer, address indexed tokenHolder);
+
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
 }
