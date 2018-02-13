@@ -76,7 +76,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[1], 10);
   }).timeout(6000);
 
-  it('should not mint -10 XRT (negative value)', async () => {
+  it('should not mint -10 XRT (negative amount)', async () => {
     await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
       gas: 300000,
       from: accounts[0],
@@ -112,7 +112,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[2], 3);
   });
 
-  it('should not let addr 1 send -3 XRT (negative value)', async () => {
+  it('should not let addr 1 send -3 XRT (negative amount)', async () => {
     await referenceToken.send(accounts[2], web3.utils.toWei('-3'), {
       gas: 300000,
       from: accounts[1],
@@ -207,7 +207,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[2], 4.12);
   }).timeout(6000);
 
-  it('should not burn -3.84 XRT (negative value)', async () => {
+  it('should not burn -3.84 XRT (negative amount)', async () => {
     await referenceToken.burn(
       accounts[1], web3.utils.toWei('-3.84'), '0x', '0x',
       { from: accounts[0], gas: 300000 }
