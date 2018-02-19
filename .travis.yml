@@ -1,4 +1,18 @@
 language: 'node_js'
 node_js:
  - '8'
-script: npm run ci
+matrix:
+  include:
+    - node_js: '8'
+      env: TASK=JS-LINT
+    - node_js: '8'
+      env: TASK=SOL-LINT
+    - node_js: '8'
+      env: TASK=TEST
+install:
+  - npm install
+  - if [ "$TASK" = "TEST" ]; then npm run build; fi
+script:
+  - if [ "$TASK" = "JS-LINT" ]; then npm run js-lint; fi
+  - if [ "$TASK" = "SOL-LINT" ]; then npm run sol-lint; fi
+  - if [ "$TASK" = "TEST" ]; then npm run test; fi

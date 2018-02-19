@@ -5,8 +5,9 @@
 const TestRPC = require('ethereumjs-testrpc');
 const Web3 = require('web3');
 const chai = require('chai');
-const EIP820 = require('eip820');
-const ReferenceToken = require('../js/ReferenceToken');
+const EIP820Registry = require('eip820');
+const ReferenceToken = require('../build/contracts').ReferenceToken;
+const ExampleTokenRecipient = require('../build/contracts').ExampleTokenRecipient;
 const assert = chai.assert;
 chai.use(require('chai-as-promised')).should();
 
@@ -15,7 +16,8 @@ describe('EIP777 Reference Token Test', () => {
   let web3;
   let accounts;
   let referenceToken;
-  let interfaceImplementationRegistry;
+  let exampleTokenRecipient;
+  let eip820Registry;
   let util;
 
   before(async () => {
@@ -29,8 +31,8 @@ describe('EIP777 Reference Token Test', () => {
     web3 = new Web3('ws://localhost:8546');
     accounts = await web3.eth.getAccounts();
 
-    interfaceImplementationRegistry = await EIP820.deploy(web3, accounts[0]);
-    assert.ok(interfaceImplementationRegistry.$address);
+    eip820Registry = await EIP820Registry.deploy(web3, accounts[0]);
+    assert.ok(eip820Registry.$address);
   });
 
   after(async () => testrpc.close());
@@ -74,7 +76,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[1], 10);
   }).timeout(6000);
 
-  it('should not mint -10 XRT (negative value)', async () => {
+  it('should not mint -10 XRT (negative amount)', async () => {
     await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
       gas: 300000,
       from: accounts[0],
@@ -110,7 +112,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[2], 3);
   });
 
-  it('should not let addr 1 send -3 XRT (negative value)', async () => {
+  it('should not let addr 1 send -3 XRT (negative amount)', async () => {
     await referenceToken.send(accounts[2], web3.utils.toWei('-3'), {
       gas: 300000,
       from: accounts[1],
@@ -205,7 +207,7 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[2], 4.12);
   }).timeout(6000);
 
-  it('should not burn -3.84 XRT (negative value)', async () => {
+  it('should not burn -3.84 XRT (negative amount)', async () => {
     await referenceToken.burn(
       accounts[1], web3.utils.toWei('-3.84'), '0x', '0x',
       { from: accounts[0], gas: 300000 }
@@ -215,5 +217,175 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertTotalSupply(8.65);
     await util.assertBalance(accounts[1], 4.53);
     await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('should send tokens to contract which is registerd as ITokenRecipient', async () => {
+    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, true, false);
+    assert.ok(exampleTokenRecipient.$address);
+
+    await referenceToken.send(exampleTokenRecipient.$address, web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[1],
+    });
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(exampleTokenRecipient.$address, 3);
+  }).timeout(6000);
+
+  it('should not send tokens to contract which is not registerd as ITokenRecipient', async () => {
+    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, false, false);
+    assert.ok(exampleTokenRecipient.$address);
+
+    await referenceToken.send(exampleTokenRecipient.$address, web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(exampleTokenRecipient.$address, 0);
+  }).timeout(6000);
+
+  it('should not send tokens to address which prevent token received via ITokenRecipient', async () => {
+    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, true, true);
+    assert.ok(exampleTokenRecipient.$address);
+
+    const iHash = await eip820Registry.interfaceHash('ITokenRecipient');
+    await eip820Registry.setInterfaceImplementer(accounts[3], iHash, exampleTokenRecipient.$address, {
+      gas: 300000,
+      from: accounts[3],
+    });
+
+    await referenceToken.send(accounts[3], web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(accounts[3], 0);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should return 18 for decimals', async () => {
+    const decimals = await referenceToken.decimals();
+    assert.strictEqual(decimals, '18');
+    await util.log(`decimals: ${decimals}`);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should let addr 2 send 3 XRT to addr 1', async () => {
+    await referenceToken.transfer(accounts[1], web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[2],
+    });
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 4.53);
+    await util.assertBalance(accounts[2], 1.12);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should approve addr 3 to send XRT from addr 1', async () => {
+    await referenceToken.approve(accounts[3], web3.utils.toWei('3.5'), {
+      gas: 300000,
+      from: accounts[1],
+    });
+
+    await util.getBlock();
+
+    const allowance = await referenceToken.allowance(accounts[1], accounts[3]);
+    assert.strictEqual(allowance, web3.utils.toWei('3.5'));
+    await util.log(`allowance: ${allowance}`);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should let addr 3 send 3 XRT from addr 1', async () => {
+    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[3],
+    });
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should let not addr 3 send one more XRT from addr 1', async () => {
+    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('1'), {
+      gas: 300000,
+      from: accounts[3],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should disable ERC20 compatibility', async () => {
+    await referenceToken.disableERC20({
+      gas: 300000,
+      from: accounts[0],
+    });
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should not return 18 for decimals', async () => {
+    await referenceToken.decimals().should.be.rejectedWith('invalid opcode');
+    await util.log('decimals() rejected with invalid opcode');
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should not let addr 2 send 3 XRT to addr 1', async () => {
+    await referenceToken.transfer(accounts[1], web3.utils.toWei('3'), {
+      gas: 300000,
+      from: accounts[2],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should not approve addr 3 to send XRT from addr 1', async () => {
+    await referenceToken.approve(accounts[3], web3.utils.toWei('3.5'), {
+      gas: 300000,
+      from: accounts[1],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.log('approve() rejected with invalid opcode');
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should not let addr 3 send 1 XRT from addr 1', async () => {
+    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('0.5'), {
+      gas: 300000,
+      from: accounts[3],
+    }).should.be.rejectedWith('invalid opcode');
+
+    await util.getBlock();
+
+    await util.assertTotalSupply(8.65);
+    await util.assertBalance(accounts[1], 1.53);
+    await util.assertBalance(accounts[2], 4.12);
+  }).timeout(6000);
+
+  it('ERC20 compatibility: should enable ERC20 compatibility again', async () => {
+    await referenceToken.enableERC20({
+      gas: 300000,
+      from: accounts[0],
+    });
+
+    const decimals = await referenceToken.decimals();
+    assert.strictEqual(decimals, '18');
+    await util.log(`decimals: ${decimals}`);
   }).timeout(6000);
 });
