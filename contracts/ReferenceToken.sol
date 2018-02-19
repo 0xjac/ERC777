@@ -271,7 +271,7 @@ contract ReferenceToken is Owned, erc20_token, erc777_token, EIP820Implementer {
     {
         requireMultiple(_amount);
 
-        callSender(_operator, _from, _to, _value, _userData, _operatorData, _preventLocking);
+        callSender(_operator, _from, _to, _amount, _userData, _operatorData, _preventLocking);
 
         require(_to != address(0));          // forbid sending to 0x0 (=burning)
         require(mBalances[_from] >= _amount); // ensure enough funds

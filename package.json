@@ -43,9 +43,9 @@
   "homepage": "https://github.com/jacquesd/eip777#readme",
   "dependencies": {
     "chai-as-promised": "^7.1.1",
-    "eip820": "0.0.17",
+    "eip820": "0.0.18",
     "giveth-common-contracts": "^0.4.0",
-    "solcpiler": "0.0.12",
+    "solcpiler": "0.0.17",
     "web3": "^1.0.0-beta.27"
   },
   "devDependencies": {

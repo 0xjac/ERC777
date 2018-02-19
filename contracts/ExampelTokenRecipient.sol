@@ -4,18 +4,29 @@
 
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
-import "./ITokenRecipient.sol";
-import "../node_modules/eip820/contracts/EIP820Implementer.sol";
+import "./erc777_tokenHolder.sol";
+import "eip820/contracts/EIP820Implementer.sol";
+import "eip820/contracts/EIP820ImplementerInterface.sol";
 
 
-contract ExampleTokenRecipient is EIP820Implementer, EIP820ImplementerInterface, ITokenRecipient {
+contract ExampleTokenRecipient is EIP820Implementer, EIP820ImplementerInterface, erc777_tokenHolder {
     bool private preventTokenReceived;
 
     function ExampleTokenRecipient(bool _setInterface, bool _preventTokenReceived) public {
         if (_setInterface) {
-            setInterfaceImplementation("ITokenRecipient", this);
+            setInterfaceImplementation("erc777_tokenHolder", this);
         }
         preventTokenReceived = _preventTokenReceived;
+    }
+
+    function tokensToSend(
+        address operator,   // solhint-disable no-unused-vars
+        address from,
+        address to,
+        uint amount,
+        bytes userData,
+        bytes operatorData) public {
+        return; // Accepts any thing
     }
 
     function tokensReceived(

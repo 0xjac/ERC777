@@ -251,11 +251,11 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(exampleTokenRecipient.$address, 0);
   }).timeout(6000);
 
-  it('should not send tokens to address which prevent token received via ITokenRecipient', async () => {
+  it('should not send tokens to address which prevent token received via erc777_tokenHolder', async () => {
     exampleTokenRecipient = await ExampleTokenRecipient.new(web3, true, true);
     assert.ok(exampleTokenRecipient.$address);
 
-    const iHash = await eip820Registry.interfaceHash('ITokenRecipient');
+    const iHash = await eip820Registry.interfaceHash('erc777_tokenHolder');
     await eip820Registry.setInterfaceImplementer(accounts[3], iHash, exampleTokenRecipient.$address, {
       gas: 300000,
       from: accounts[3],

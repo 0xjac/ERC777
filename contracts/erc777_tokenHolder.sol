@@ -5,6 +5,7 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
+// solhint-disable-next-line contract-name-camelcase
 interface erc777_tokenHolder {
     function tokensToSend(
         address operator,
