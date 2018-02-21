@@ -16,6 +16,7 @@ import "giveth-common-contracts/contracts/Owned.sol";
 import "giveth-common-contracts/contracts/SafeMath.sol";
 import "./Ierc20.sol";
 import "./Ierc777.sol";
+import "./IAuthorizer.sol";
 import "./ITokenRecipient.sol";
 
 
@@ -30,7 +31,14 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     bool private mErc20compatible;
 
     mapping(address => uint) private mBalances;
-    mapping(address => mapping(address => bool)) private mAuthorized;
+
+    mapping(address => address) private mDelegates;
+    mapping(address => address) private mAuthorizerForDelegates;
+    mapping(address => address) private mDelegateForAuthorizers;
+
+    mapping(address => mapping(address => bool)) private mOperators;
+    mapping(address => uint256) private mOperatorCount;
+
     mapping(address => mapping(address => uint256)) private mAllowed;
 
     /* -- Constructor -- */
@@ -90,11 +98,67 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
         doSend(msg.sender, _to, _amount, _userData, msg.sender, "", true);
     }
 
+    /// @notice Authorize a third party `_delegate` to send `msg.sender`'s tokens upon authorization of `_authorizer`.
+    /// @param _delegate Address that will to be authorized to send `msg.sender`'s tokens.
+    /// @param _authorizer Contract which will authorize `_delegate` to send tokens.
+    function authorizeDelegate(address _delegate, address _authorizer) public {
+        // delegate MUST NOT be the principal
+        require(_delegate != msg.sender);
+        address principal = delegateFor(_delegate);
+        // delegate either MUST NOT be a delegate or MUST BE a delegate for the same principal
+        require(principal == address(0) || principal == msg.sender);
+        // delegate MUST NOT have funds (prevents locking)
+        require(mBalances[_delegate] == 0);
+
+        // authorizer MUST NOT be an operator
+        require(mOperatorCount[_authorizer] == 0);
+        // authorizer MUST NOT already be an authorizer
+        require(mDelegateForAuthorizers[_authorizer] == address(0));
+
+        // require(!isOperatorFor(_delegate, msg.sender));
+        // TODO Figre out if there is a problem with the delegate of A being an operator of B?
+
+        mDelegates[_delegate] = msg.sender;
+        mAuthorizerForDelegates[_delegate] = _authorizer;
+        mDelegateForAuthorizers[_authorizer] = _delegate;
+
+        AuthorizedDelegate(_delegate, _authorizer, msg.sender);
+    }
+
+    /// @notice Revoke a third party `_delegate`'s rights to send `msg.sender`'s tokens.
+    /// @param _delegate Delegate that will be Revoked
+    function revokeDelegate(address _delegate) public {
+        require(delegateFor(_delegate) == msg.sender);
+
+        address oldAuthorizer = mAuthorizerForDelegates[_delegate];
+        mDelegates[_delegate] = address(0);
+        mAuthorizerForDelegates[_delegate] = address(0);
+        mDelegateForAuthorizers[oldAuthorizer] = address(0);
+
+        RevokedDelegate(_delegate, oldAuthorizer, msg.sender);
+    }
+
+    /// @notice Get the address for which `_delegate` is authorized to send tokens
+    ///  or `0x0` if `_delegate` is not a delegate.
+    /// @param _delegate address for which to return the principal address.
+    /// @return Address for which `_delegate` is authorized to send tokens or `0x0` if `_delegate` is not a delegate.
+    function delegateFor(address _delegate) public constant returns (address) { return mDelegates[_delegate]; }
+
+    /// @notice Get the authorizer contract address of `_delegate` or `0x0` if `_delegate` is not a delegate.
+    /// @param _delegate Delegate address for which to return the authorizer contract address.
+    /// @return Authorizer contract address of `_delegate` or `0x0` if `_delegate` is not a delegate.
+    function authorizerOf(address _delegate) public constant returns (address) {
+        return mAuthorizerForDelegates[_delegate];
+    }
+
     /// @notice Authorize a third party `_operator` to manage (send) `msg.sender`'s tokens.
     /// @param _operator The operator that wants to be Authorized
     function authorizeOperator(address _operator) public {
         require(_operator != msg.sender);
-        mAuthorized[_operator][msg.sender] = true;
+        require(delegateFor(_operator) == address(0));
+        // require(delegateFor(_operator) == msg.sender);
+        if (!mOperators[_operator][msg.sender]) { mOperatorCount[_operator] += 1; }
+        mOperators[_operator][msg.sender] = true;
         AuthorizedOperator(_operator, msg.sender);
     }
 
@@ -102,7 +166,8 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     /// @param _operator The operator that wants to be Revoked
     function revokeOperator(address _operator) public {
         require(_operator != msg.sender);
-        mAuthorized[_operator][msg.sender] = false;
+        if (mOperators[_operator][msg.sender]) { mOperatorCount[_operator] -= 1; }
+        mOperators[_operator][msg.sender] = false;
         RevokedOperator(_operator, msg.sender);
     }
 
@@ -111,7 +176,7 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
     /// @param _tokenHolder address which holds the tokens to be managed
     /// @return `true` if `_operator` is authorized for `_tokenHolder`
     function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
-        return _operator == _tokenHolder || mAuthorized[_operator][_tokenHolder];
+        return _operator == _tokenHolder || mOperators[_operator][_tokenHolder];
     }
 
     /// @notice Send `_amount` of tokens on behalf of the address `from` to the address `to`.
@@ -270,16 +335,28 @@ contract ReferenceToken is Owned, Ierc20, Ierc777, EIP820Implementer {
         private
     {
         requireMultiple(_amount);
-        require(_to != address(0));          // forbid sending to 0x0 (=burning)
-        require(mBalances[_from] >= _amount); // ensure enough funds
+        require(_to != address(0)); // forbid sending to 0x0 (=burning)
+        require(delegateFor(_to) == address(0)); // cannot send to a delegate
 
-        mBalances[_from] = mBalances[_from].sub(_amount);
+        address from = delegateFor(_from);
+        if (from == address(0)) { from = _from; }
+
+        require(mBalances[from] >= _amount); // ensure enough funds
+
+        mBalances[from] = mBalances[from].sub(_amount);
         mBalances[_to] = mBalances[_to].add(_amount);
 
-        callRecipient(_operator, _from, _to, _amount, _userData, _operatorData, _preventLocking);
+        callDelegate(_from, from, _to, _amount, _userData);
+        callRecipient(_operator, from, _to, _amount, _userData, _operatorData, _preventLocking);
 
-        Sent(_operator, _from, _to, _amount, _userData, _operatorData);
-        if (mErc20compatible) { Transfer(_from, _to, _amount); }
+        Sent(_operator, from, _to, _amount, _userData, _operatorData);
+        if (mErc20compatible) { Transfer(from, _to, _amount); }
+    }
+
+    function callDelegate(address _delegate, address _from, address _to, uint256 _amount, bytes _userData) private {
+        if (_delegate != _from) { // if they differ then `_delegate` is truly a delegate
+            IAuthorizer(mAuthorizerForDelegates[_delegate]).authorizeSend(_to, _amount, _userData);
+        }
     }
 
     /// @notice Helper function that checks for ITokenRecipient on the recipient and calls it.
