@@ -5,8 +5,7 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
-// solhint-disable-next-line contract-name-camelcase
-interface erc20_token {
+interface ERC20Token {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
     function decimals() public constant returns (uint8);

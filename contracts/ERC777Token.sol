@@ -5,8 +5,7 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
-// solhint-disable-next-line contract-name-camelcase
-interface erc777_token {
+interface ERC777Token {
     function name() public constant returns (string);
     function symbol() public constant returns (string);
     function totalSupply() public constant returns (uint256);
