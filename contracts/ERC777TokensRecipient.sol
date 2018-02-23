@@ -5,7 +5,7 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 
-interface ERC777TokensReceiver {
+interface ERC777TokensRecipient {
     function tokensReceived(
         address operator,
         address from,

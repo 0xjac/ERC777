@@ -2,7 +2,16 @@
   "name": "eip777",
   "version": "0.0.3",
   "description": "A New Advanced Token Standard",
-  "keywords": ["ERC20", "ERC-20", "ERC-777", "ERC77", "Token", "Standard", "Solidity", "Ethereum"],
+  "keywords": [
+    "ERC20",
+    "ERC-20",
+    "ERC-777",
+    "ERC77",
+    "Token",
+    "Standard",
+    "Solidity",
+    "Ethereum"
+  ],
   "main": "js/ReferenceToken.js",
   "directories": {
     "test": "test"
@@ -42,9 +51,7 @@
   },
   "homepage": "https://github.com/jacquesd/eip777#readme",
   "dependencies": {
-    "chai-as-promised": "^7.1.1",
     "eip820": "0.0.18",
-    "giveth-common-contracts": "^0.4.0",
     "solcpiler": "0.0.17",
     "web3": "^1.0.0-beta.27"
   },
@@ -61,6 +68,7 @@
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
     "ethereumjs-testrpc": "git://github.com/jbaylina/testrpc.git",
+    "giveth-common-contracts": "^0.4.0",
     "jshint-esnext": "^2.7.0-3",
     "mocha": "^4.1.0",
     "solhint": "^1.1.10",

@@ -7,7 +7,7 @@ const Web3 = require('web3');
 const chai = require('chai');
 const EIP820Registry = require('eip820');
 const ReferenceToken = require('../build/contracts').ReferenceToken;
-const ExampleTokenRecipient = require('../build/contracts').ExampleTokenRecipient;
+const ExampleTokensRecipient = require('../build/contracts').ExampleTokensRecipient;
 const assert = chai.assert;
 chai.use(require('chai-as-promised')).should();
 
@@ -16,7 +16,7 @@ describe('EIP777 Reference Token Test', () => {
   let web3;
   let accounts;
   let referenceToken;
-  let exampleTokenRecipient;
+  let exampleTokensRecipient;
   let eip820Registry;
   let util;
 
@@ -219,11 +219,11 @@ describe('EIP777 Reference Token Test', () => {
     await util.assertBalance(accounts[2], 4.12);
   }).timeout(6000);
 
-  it('should send tokens to contract which is registerd as ITokenRecipient', async () => {
-    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, true, false);
-    assert.ok(exampleTokenRecipient.$address);
+  it('should send tokens to contract which is registerd as ERC777TokensRecipient', async () => {
+    exampleTokensRecipient = await ExampleTokensRecipient.new(web3, true, false);
+    assert.ok(exampleTokensRecipient.$address);
 
-    await referenceToken.send(exampleTokenRecipient.$address, web3.utils.toWei('3'), {
+    await referenceToken.send(exampleTokensRecipient.$address, web3.utils.toWei('3'), {
       gas: 300000,
       from: accounts[1],
     });
@@ -232,14 +232,14 @@ describe('EIP777 Reference Token Test', () => {
 
     await util.assertTotalSupply(8.65);
     await util.assertBalance(accounts[1], 1.53);
-    await util.assertBalance(exampleTokenRecipient.$address, 3);
+    await util.assertBalance(exampleTokensRecipient.$address, 3);
   }).timeout(6000);
 
-  it('should not send tokens to contract which is not registerd as ITokenRecipient', async () => {
-    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, false, false);
-    assert.ok(exampleTokenRecipient.$address);
+  it('should not send tokens to contract which is not registerd as ERC777TokensRecipient', async () => {
+    exampleTokensRecipient = await ExampleTokensRecipient.new(web3, false, false);
+    assert.ok(exampleTokensRecipient.$address);
 
-    await referenceToken.send(exampleTokenRecipient.$address, web3.utils.toWei('3'), {
+    await referenceToken.send(exampleTokensRecipient.$address, web3.utils.toWei('3'), {
       gas: 300000,
       from: accounts[1],
     }).should.be.rejectedWith('invalid opcode');
@@ -248,15 +248,15 @@ describe('EIP777 Reference Token Test', () => {
 
     await util.assertTotalSupply(8.65);
     await util.assertBalance(accounts[1], 1.53);
-    await util.assertBalance(exampleTokenRecipient.$address, 0);
+    await util.assertBalance(exampleTokensRecipient.$address, 0);
   }).timeout(6000);
 
-  it('should not send tokens to address which prevent token received via erc777_tokenHolder', async () => {
-    exampleTokenRecipient = await ExampleTokenRecipient.new(web3, true, true);
-    assert.ok(exampleTokenRecipient.$address);
+  it('should not send tokens to address which prevent token received via ERC777TokensRecipient', async () => {
+    exampleTokensRecipient = await ExampleTokensRecipient.new(web3, true, true);
+    assert.ok(exampleTokensRecipient.$address);
 
-    const iHash = await eip820Registry.interfaceHash('erc777_tokenHolder');
-    await eip820Registry.setInterfaceImplementer(accounts[3], iHash, exampleTokenRecipient.$address, {
+    const iHash = await eip820Registry.interfaceHash('ERC777TokensRecipient');
+    await eip820Registry.setInterfaceImplementer(accounts[3], iHash, exampleTokensRecipient.$address, {
       gas: 300000,
       from: accounts[3],
     });

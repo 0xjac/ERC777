@@ -4,35 +4,18 @@
 
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
-import "./ERC777TokensSender.sol";
-import "./ERC777TokensReceiver.sol";
+import "./ERC777TokensRecipient.sol";
 import "eip820/contracts/EIP820Implementer.sol";
 import "eip820/contracts/EIP820ImplementerInterface.sol";
 
 
-contract ExampleTokenRecipient is
-        EIP820Implementer,
-        EIP820ImplementerInterface,
-        ERC777TokensSender,
-        ERC777TokensReceiver {
+contract ExampleTokensRecipient is EIP820Implementer, EIP820ImplementerInterface, ERC777TokensRecipient {
+
     bool private preventTokenReceived;
 
-    function ExampleTokenRecipient(bool _setInterface, bool _preventTokenReceived) public {
-        if (_setInterface) {
-            setInterfaceImplementation("ERC777TokensSender", this);
-            setInterfaceImplementation("ERC777TokensReceiver", this);
-        }
+    function ExampleTokensRecipient(bool _setInterface, bool _preventTokenReceived) public {
+        if (_setInterface) { setInterfaceImplementation("ERC777TokensRecipient", this); }
         preventTokenReceived = _preventTokenReceived;
-    }
-
-    function tokensToSend(
-        address operator,   // solhint-disable no-unused-vars
-        address from,
-        address to,
-        uint amount,
-        bytes userData,
-        bytes operatorData) public {
-        return; // Accepts any thing
     }
 
     function tokensReceived(
@@ -45,9 +28,7 @@ contract ExampleTokenRecipient is
     )  // solhint-enable no-unused-vars
         public
     {
-        if (preventTokenReceived) {
-            require(false);
-        }
+        if (preventTokenReceived) { require(false); }
     }
 
     // solhint-disable-next-line no-unused-vars
