@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const TestRPC = require('ethereumjs-testrpc');
+const TestRPC = require('ganache-cli');
 const Web3 = require('web3');
 const chai = require('chai');
 const EIP820Registry = require('eip820');
@@ -77,10 +77,11 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not mint -10 XRT (negative amount)', async () => {
-    await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
+    const tx = await referenceToken.mint(accounts[1], web3.utils.toWei('-10'), '0x', {
       gas: 300000,
       from: accounts[0],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
     await util.getBlock();
 
     await util.assertTotalSupply(10);
@@ -100,10 +101,11 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not let addr 1 send 9 XRT (not enough funds)', async () => {
-    await referenceToken.send(accounts[2], web3.utils.toWei('9'), {
+    const tx = await referenceToken.send(accounts[2], web3.utils.toWei('9'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -113,10 +115,11 @@ describe('EIP777 Reference Token Test', () => {
   });
 
   it('should not let addr 1 send -3 XRT (negative amount)', async () => {
-    await referenceToken.send(accounts[2], web3.utils.toWei('-3'), {
+    const tx = await referenceToken.send(accounts[2], web3.utils.toWei('-3'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -126,10 +129,11 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not let addr 1 send 0.007 XRT (< granulairty)', async () => {
-    await referenceToken.send(accounts[2], web3.utils.toWei('0.007'), {
+    const tx = await referenceToken.send(accounts[2], web3.utils.toWei('0.007'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -180,14 +184,16 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not let addr 3 send from addr 1 (not operator)', async () => {
-    await referenceToken.operatorSend(
+    const tx = await referenceToken.operatorSend(
       accounts[1],
       accounts[2],
       web3.utils.toWei('3.72'),
       '0x',
       '0x',
       { gas: 300000, from: accounts[3] }
-    ).should.be.rejectedWith('invalid opcode');
+    );
+    assert.equal('0x00', tx.status);
+
     await util.getBlock();
 
     await util.assertTotalSupply(10);
@@ -208,10 +214,12 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('should not burn -3.84 XRT (negative amount)', async () => {
-    await referenceToken.burn(
+    const tx = await referenceToken.burn(
       accounts[1], web3.utils.toWei('-3.84'), '0x', '0x',
       { from: accounts[0], gas: 300000 }
-    ).should.be.rejectedWith('invalid opcode');
+    );
+    assert.equal('0x00', tx.status);
+
     await util.getBlock();
 
     await util.assertTotalSupply(8.65);
@@ -239,10 +247,11 @@ describe('EIP777 Reference Token Test', () => {
     exampleTokensRecipient = await ExampleTokensRecipient.new(web3, false, false);
     assert.ok(exampleTokensRecipient.$address);
 
-    await referenceToken.send(exampleTokensRecipient.$address, web3.utils.toWei('3'), {
+    const tx = await referenceToken.send(exampleTokensRecipient.$address, web3.utils.toWei('3'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -261,10 +270,11 @@ describe('EIP777 Reference Token Test', () => {
       from: accounts[3],
     });
 
-    await referenceToken.send(accounts[3], web3.utils.toWei('3'), {
+    const tx = await referenceToken.send(accounts[3], web3.utils.toWei('3'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -319,10 +329,11 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('ERC20 compatibility: should let not addr 3 send one more XRT from addr 1', async () => {
-    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('1'), {
+    const tx = await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('1'), {
       gas: 300000,
       from: accounts[3],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -339,15 +350,16 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('ERC20 compatibility: should not return 18 for decimals', async () => {
-    await referenceToken.decimals().should.be.rejectedWith('invalid opcode');
+    await referenceToken.decimals().should.be.rejectedWith('Invalid JSON RPC response');
     await util.log('decimals() rejected with invalid opcode');
   }).timeout(6000);
 
   it('ERC20 compatibility: should not let addr 2 send 3 XRT to addr 1', async () => {
-    await referenceToken.transfer(accounts[1], web3.utils.toWei('3'), {
+    const tx = await referenceToken.transfer(accounts[1], web3.utils.toWei('3'), {
       gas: 300000,
       from: accounts[2],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 
@@ -357,19 +369,21 @@ describe('EIP777 Reference Token Test', () => {
   }).timeout(6000);
 
   it('ERC20 compatibility: should not approve addr 3 to send XRT from addr 1', async () => {
-    await referenceToken.approve(accounts[3], web3.utils.toWei('3.5'), {
+    const tx = await referenceToken.approve(accounts[3], web3.utils.toWei('3.5'), {
       gas: 300000,
       from: accounts[1],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.log('approve() rejected with invalid opcode');
   }).timeout(6000);
 
   it('ERC20 compatibility: should not let addr 3 send 1 XRT from addr 1', async () => {
-    await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('0.5'), {
+    const tx = await referenceToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei('0.5'), {
       gas: 300000,
       from: accounts[3],
-    }).should.be.rejectedWith('invalid opcode');
+    });
+    assert.equal('0x00', tx.status);
 
     await util.getBlock();
 

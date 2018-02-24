@@ -5,11 +5,11 @@
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "./ERC777TokensRecipient.sol";
-import "eip820/contracts/EIP820Implementer.sol";
-import "eip820/contracts/EIP820ImplementerInterface.sol";
+import "eip820/contracts/ERC820Implementer.sol";
+import "eip820/contracts/ERC820ImplementerInterface.sol";
 
 
-contract ExampleTokensRecipient is EIP820Implementer, EIP820ImplementerInterface, ERC777TokensRecipient {
+contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface, ERC777TokensRecipient {
 
     bool private preventTokenReceived;
 
@@ -32,8 +32,8 @@ contract ExampleTokensRecipient is EIP820Implementer, EIP820ImplementerInterface
     }
 
     // solhint-disable-next-line no-unused-vars
-    function canImplementInterfaceForAddress(address addr, bytes32 interfaceHash) public view returns(bool) {
-        return true;
+    function canImplementInterfaceForAddress(address addr, bytes32 interfaceHash) public view returns(bytes32) {
+        return ERC820_ACCEPT_MAGIC;
     }
 
 }

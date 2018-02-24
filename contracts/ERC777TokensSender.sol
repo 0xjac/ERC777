@@ -10,7 +10,7 @@ interface ERC777TokensSender {
         address operator,
         address from,
         address to,
-        uint value,
+        uint amount,
         bytes userData,
         bytes operatorData
     ) public;
