@@ -24,3 +24,5 @@ deploy:
   on:
     tags: true
     repo: jacquesd/eip777
+  before_deploy:
+    - npm install
