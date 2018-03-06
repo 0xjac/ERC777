@@ -8,9 +8,22 @@ const util = require('./util');
 
 exports.test = function() {
   it('should disable ERC20 compatibility', async function() {
+    let erc20Hash = await this.erc820Registry.interfaceHash('ERC20Token');
+    let erc20Addr = await this.erc820Registry.getInterfaceImplementer(
+      this.referenceToken.$address, erc20Hash);
+
+    assert.strictEqual(erc20Addr, this.referenceToken.$address);
+
     await this.referenceToken.disableERC20(
       { gas: 300000, from: this.accounts[0] }
     );
+
+    await util.getBlock();
+
+    erc20Addr = await this.erc820Registry.getInterfaceImplementer(
+      this.referenceToken.$address, erc20Hash);
+
+    assert.strictEqual(erc20Addr, '0x0000000000000000000000000000000000000000');
   }).timeout(6000);
 
   it('should not return 18 for decimals', async function() {
@@ -74,8 +87,21 @@ exports.test = function() {
   }).timeout(6000);
 
   it('should enable ERC20 compatibility', async function() {
+    let erc20Hash = await this.erc820Registry.interfaceHash('ERC20Token');
+    let erc20Addr = await this.erc820Registry.getInterfaceImplementer(
+      this.referenceToken.$address, erc20Hash);
+
+    assert.strictEqual(erc20Addr, '0x0000000000000000000000000000000000000000');
+
     await this.referenceToken.enableERC20(
       { gas: 300000, from: this.accounts[0] }
     );
+
+    await util.getBlock();
+
+    erc20Addr = await this.erc820Registry.getInterfaceImplementer(
+      this.referenceToken.$address, erc20Hash);
+
+    assert.strictEqual(erc20Addr, this.referenceToken.$address);
   }).timeout(6000);
 };

@@ -7,6 +7,14 @@ chai.use(require('chai-as-promised')).should();
 const util = require('./util');
 
 exports.test = function() {
+  it('should register the "ERC20Token" interface', async function() {
+    let erc20Hash = await this.erc820Registry.interfaceHash('ERC20Token');
+    let erc20Addr = await this.erc820Registry.getInterfaceImplementer(
+      this.referenceToken.$address, erc20Hash);
+
+    assert.strictEqual(erc20Addr, this.referenceToken.$address);
+  });
+
   it('should return 18 for decimals', async function() {
     const decimals = await this.referenceToken.decimals();
     assert.strictEqual(decimals, '18');

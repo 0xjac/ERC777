@@ -176,14 +176,14 @@ contract ReferenceToken is Owned, ERC20Token, ERC777Token, ERC820Implementer {
     ///  by the owner.
     function disableERC20() public onlyOwner {
         mErc20compatible = false;
-        setInterfaceImplementation("Ierc20", 0x0);
+        setInterfaceImplementation("ERC20Token", 0x0);
     }
 
     /// @notice Re enables the ERC-20 interface. This function can only be called
     ///  by the owner.
     function enableERC20() public onlyOwner {
         mErc20compatible = true;
-        setInterfaceImplementation("Ierc20", this);
+        setInterfaceImplementation("ERC20Token", this);
     }
 
     /// @notice For Backwards compatibility
