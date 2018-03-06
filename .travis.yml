@@ -24,3 +24,4 @@ deploy:
   on:
     tags: true
     repo: jacquesd/eip777
+    branch: master
