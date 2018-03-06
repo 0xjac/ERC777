@@ -13,10 +13,10 @@ describe('ERC777 ReferenceToken', function() {
   let server;
   let web3;
   let accounts;
-  let eip820Registry;
+  let erc820Registry;
 
   before(async function() {
-    ({ server, web3, accounts, eip820Registry } =
+    ({ server, web3, accounts, erc820Registry } =
       await util.setupGanache('127.0.0.1', 8546));
   });
 
@@ -35,35 +35,35 @@ describe('ERC777 ReferenceToken', function() {
 
   describe('Attributes', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./attributes').test();
   });
 
   describe('Mint', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./mint').test();
   });
 
   describe('Burn', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./burn').test();
   });
 
   describe('Send', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./send').test();
   });
 
   describe('Operator', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./operator').test();
   });
@@ -78,14 +78,14 @@ describe('ERC777 ReferenceToken', function() {
 
   describe('ERC-20 Compatibility', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./erc20').test();
   });
 
   describe('ERC-20 Disabled', async function() {
     beforeEach(function() {
-      Object.assign(this, { accounts, referenceToken, web3, eip820Registry });
+      Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./erc20-disabled').test();
   });

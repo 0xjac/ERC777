@@ -15,7 +15,7 @@ let blockIdx = 0;
 let server;
 let web3;
 let accounts;
-let eip820Registry;
+let erc820Registry;
 let tokenContract;
 
 module.exports = {
@@ -29,14 +29,14 @@ module.exports = {
     log(`Ganache listening on ${host}:${port}`);
     accounts = await web3.eth.getAccounts();
 
-    eip820Registry = await EIP820Registry.deploy(web3, accounts[0]);
-    assert.ok(eip820Registry.$address);
+    erc820Registry = await EIP820Registry.deploy(web3, accounts[0]);
+    assert.ok(erc820Registry.$address);
 
     return {
       server,
       web3,
       accounts,
-      eip820Registry,
+      erc820Registry,
     };
   },
 
