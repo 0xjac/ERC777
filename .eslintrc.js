@@ -1,5 +1,5 @@
-{
-  "extends" : [
+module.exports = {
+  "extends": [
     "standard",
     "plugin:promise/recommended"
   ],
@@ -21,11 +21,11 @@
   "rules": {
 
     // Strict mode
-    "strict": [2, "global"],
+    "strict": ["error", "global"],
 
     // Code style
-    "indent": [2, 2],
-    "quotes": [2, "single"],
+    "indent": ["error", 2],
+    "quotes": ["error", "single", {"avoidEscape": true}],
     "semi": ["error", "always"],
     "space-before-function-paren": ["error", {
       "anonymous": "never",
@@ -33,23 +33,23 @@
       "asyncArrow": "always"
     }],
     "no-use-before-define": 0,
-    "eqeqeq": [2, "smart"],
-    "dot-notation": [2, {"allowKeywords": true, "allowPattern": ""}],
-    "no-redeclare": [2, {"builtinGlobals": true}],
-    "no-trailing-spaces": [2, { "skipBlankLines": true }],
+    "eqeqeq": ["error", "smart"],
+    "dot-notation": ["error", {"allowKeywords": true, "allowPattern": ""}],
+    "no-redeclare": ["error", {"builtinGlobals": true}],
+    "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "eol-last": 1,
-    "comma-spacing": [2, {"before": false, "after": true}],
-    "camelcase": [2, {"properties": "always"}],
-    "no-mixed-spaces-and-tabs": [2, "smart-tabs"],
+    "comma-spacing": ["error", {"before": false, "after": true}],
+    "camelcase": ["error", {"properties": "always"}],
+    "no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
     "comma-dangle": [1, "always-multiline"],
-    "no-dupe-args": 2,
-    "no-dupe-keys": 2,
+    "no-dupe-args": "error",
+    "no-dupe-keys": "error",
     "no-debugger": 0,
-    "no-undef": 2,
-    "object-curly-spacing": [2, "always"],
-    "max-len": [2, 120, 2],
+    "no-undef": "error",
+    "object-curly-spacing": ["error", "always"],
+    "max-len": ["error", 80, 2],
     "generator-star-spacing": ["error", "before"],
     "promise/avoid-new": 0,
     "promise/always-return": 0
   }
-}
+};

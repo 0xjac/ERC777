@@ -20,7 +20,7 @@
     "test": "mocha --harmony --exit",
     "sol-compile": "solcpiler -i './contracts/*.sol'",
     "sol-lint": "node_modules/solhint/solhint.js --formatter ../../../eslint-formatter-stylish-verbose contracts/*.sol",
-    "js-lint": "node_modules/eslint/bin/eslint.js --format eslint-formatter-stylish-verbose test/",
+    "js-lint": "node_modules/eslint/bin/eslint.js --max-warnings 0 --format eslint-formatter-stylish-verbose test/",
     "lint": "npm run sol-lint && npm run js-lint",
     "check": "npm run lint && npm run build && npm run test",
     "build": "npm run clean && npm run sol-compile",
