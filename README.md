@@ -17,18 +17,18 @@ modifications to [`eip-777.md`](eip-777.md).
 The reference implementation is available at: [contracts/ReferenceToken.sol](contracts/ReferenceToken.sol)
 
 ## Logo
-The loogo for the standard can be found in the [logo](logo) folder in [svg](logo/svg) and [png](logo/png) formats.
+The logo for the standard can be found in the [logo](logo) folder in [svg](logo/svg) and [png](logo/png) formats.
 
 Variations exist in 5 colors as follow:
 
 <table>
   <tr>
     <th>Image</th>
-    <th><img src="https://github.com/jacquesd/eip777/raw/feat-logo/logo/png/ERC-777-logo-beige-192px.png" height="46px" align="top"></img></th>
-    <th><img src="https://github.com/jacquesd/eip777/raw/feat-logo/logo/png/ERC-777-logo-white-192px.png" height="46px" align="top"></img></th>
-    <th><img src="https://github.com/jacquesd/eip777/raw/feat-logo/logo/png/ERC-777-logo-light_grey-192px.png" height="46px" align="top"></img></th>
-    <th><img src="https://github.com/jacquesd/eip777/raw/feat-logo/logo/png/ERC-777-logo-dark_grey-192px.png" height="46px" align="top"></img></th>
-    <th><img src="https://github.com/jacquesd/eip777/raw/feat-logo/logo/png/ERC-777-logo-black-192px.png" height="46px" align="top"></img></th>
+    <th><img src="https://github.com/jacquesd/eip777/raw/master/logo/png/ERC-777-logo-beige-192px.png" height="46px" align="top"></img></th>
+    <th><img src="https://github.com/jacquesd/eip777/raw/master/logo/png/ERC-777-logo-white-192px.png" height="46px" align="top"></img></th>
+    <th><img src="https://github.com/jacquesd/eip777/raw/master/logo/png/ERC-777-logo-light_grey-192px.png" height="46px" align="top"></img></th>
+    <th><img src="https://github.com/jacquesd/eip777/raw/master/logo/png/ERC-777-logo-dark_grey-192px.png" height="46px" align="top"></img></th>
+    <th><img src="https://github.com/jacquesd/eip777/raw/master/logo/png/ERC-777-logo-black-192px.png" height="46px" align="top"></img></th>
   </tr>
   <tr>
     <th>Color</th>
@@ -48,7 +48,7 @@ Variations exist in 5 colors as follow:
   </tr>
 </table>
 
-> Thanks to Samantha Rosso [@Sauuman](https://github.com/sauuman) for creating the logo.
+> Thanks to Samantha Rosso [@Sauuman](https://github.com/Sauuman) for creating the logo.
 
 ## License
 The standard definition as defined in [`eip-777.md`](eip-777.md) is placed in the public domain via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
