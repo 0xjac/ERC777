@@ -76,14 +76,14 @@ describe('ERC777 ReferenceToken', function() {
     it.skip('should implement tests for "TokensReceiver"');
   });
 
-  describe('ERC-20 Compatibility', async function() {
+  describe('ERC20 Compatibility', async function() {
     beforeEach(function() {
       Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });
     require('./erc20').test();
   });
 
-  describe('ERC-20 Disabled', async function() {
+  describe('ERC20 Disabled', async function() {
     beforeEach(function() {
       Object.assign(this, { accounts, referenceToken, web3, erc820Registry });
     });

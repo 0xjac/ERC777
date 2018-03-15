@@ -1,12 +1,10 @@
 {
-  "name": "eip777",
+  "name": "erc777",
   "version": "0.0.8",
   "description": "A New Advanced Token Standard",
   "keywords": [
     "ERC20",
-    "ERC-20",
-    "ERC-777",
-    "ERC77",
+    "ERC777",
     "Token",
     "Standard",
     "Solidity",
@@ -29,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jacquesd/eip777.git"
+    "url": "git+https://github.com/jacquesd/ERC777.git"
   },
   "contributors": [
     {
@@ -47,9 +45,9 @@
   ],
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/jacquesd/eip777/issues"
+    "url": "https://github.com/jacquesd/ERC777/issues"
   },
-  "homepage": "https://github.com/jacquesd/eip777#readme",
+  "homepage": "https://github.com/jacquesd/ERC777#readme",
   "dependencies": {
     "eip820": "0.0.20",
     "solcpiler": "0.0.17",
