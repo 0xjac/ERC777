@@ -4,7 +4,7 @@
 
 pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
-import "./ERC777TokensRecipient.sol";
+import "../ERC777TokensRecipient.sol";
 import "eip820/contracts/ERC820Implementer.sol";
 import "eip820/contracts/ERC820ImplementerInterface.sol";
 

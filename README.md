@@ -17,7 +17,7 @@ Official Proposal with discussion: [ethereum/eips/issues#777](https://github.com
 The specification can be found in this repository in [`eip-777.md`](https://github.com/jacquesd/ERC777/blob/master/eip-777.md).
 
 ## Reference Implementation
-The reference implementation is available at: [contracts/ReferenceToken.sol](contracts/ReferenceToken.sol)
+The reference implementation is available at: [contracts/examples/ReferenceToken.sol](contracts/examples/ReferenceToken.sol)
 
 ## Logo
 
