@@ -11,15 +11,15 @@ pragma solidity 0.4.21;
 ///  implementation in case of any ambiguity into the standard
 
 import "eip820/contracts/ERC820Implementer.sol";
-import "giveth-common-contracts/contracts/Owned.sol";
-import "giveth-common-contracts/contracts/SafeMath.sol";
-import "./ERC20Token.sol";
-import "./ERC777Token.sol";
-import "./ERC777TokensSender.sol";
-import "./ERC777TokensRecipient.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../ERC20Token.sol";
+import "../ERC777Token.sol";
+import "../ERC777TokensSender.sol";
+import "../ERC777TokensRecipient.sol";
 
 
-contract ReferenceToken is Owned, ERC20Token, ERC777Token, ERC820Implementer {
+contract ReferenceToken is Ownable, ERC20Token, ERC777Token, ERC820Implementer {
     using SafeMath for uint256;
 
     string private mName;
@@ -63,13 +63,13 @@ contract ReferenceToken is Owned, ERC20Token, ERC777Token, ERC820Implementer {
     function name() public constant returns (string) { return mName; }
 
     /// @return the symbol of the token
-    function symbol() public constant returns(string) { return mSymbol; }
+    function symbol() public constant returns (string) { return mSymbol; }
 
     /// @return the granularity of the token
-    function granularity() public constant returns(uint256) { return mGranularity; }
+    function granularity() public constant returns (uint256) { return mGranularity; }
 
     /// @return the total supply of the token
-    function totalSupply() public constant returns(uint256) { return mTotalSupply; }
+    function totalSupply() public constant returns (uint256) { return mTotalSupply; }
 
     /// @notice Return the account balance of some account
     /// @param _tokenHolder Address for which the balance is returned
@@ -237,7 +237,7 @@ contract ReferenceToken is Owned, ERC20Token, ERC777Token, ERC820Implementer {
     //
     /// @notice Internal function that ensures `_amount` is multiple of the granularity
     /// @param _amount The quantity that want's to be checked
-    function requireMultiple(uint256 _amount) internal {
+    function requireMultiple(uint256 _amount) internal view {
         require(_amount.div(mGranularity).mul(mGranularity) == _amount);
     }
 

@@ -15,10 +15,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --harmony --exit",
-    "sol-compile": "solcpiler -i './contracts/*.sol'",
-    "sol-lint": "node_modules/solhint/solhint.js --formatter ../../../eslint-formatter-stylish-verbose contracts/*.sol",
-    "js-lint": "node_modules/eslint/bin/eslint.js --max-warnings 0 --format eslint-formatter-stylish-verbose test/",
+    "test": "scripts/test.sh --network 'test'",
+    "sol-compile": "truffle compile",
+    "sol-lint": "npx solhint --formatter ../../../eslint-formatter-stylish-verbose 'contracts/**/*.sol'",
+    "js-lint": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
     "lint": "npm run sol-lint && npm run js-lint",
     "check": "npm run lint && npm run build && npm run test",
     "build": "npm run clean && npm run sol-compile",
@@ -50,8 +50,8 @@
   "homepage": "https://github.com/jacquesd/ERC777#readme",
   "dependencies": {
     "eip820": "0.0.20",
-    "solcpiler": "0.0.17",
-    "web3": "^1.0.0-beta.27"
+    "openzeppelin-solidity": "1.9.0",
+    "truffle": "4.1.6"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -65,11 +65,10 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "ganache-cli": "^7.0.0-beta.0",
-    "giveth-common-contracts": "^0.4.0",
+    "ganache-cli": "6.1.0",
     "jshint-esnext": "^2.7.0-3",
     "mocha": "^4.1.0",
     "solhint": "^1.1.10",
-    "solidity-coverage": "^0.4.8"
+    "web3": "1.0.0-beta.34"
   }
 }
