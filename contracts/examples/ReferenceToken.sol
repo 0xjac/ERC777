@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+pragma solidity 0.4.21;
 
 /// @title ERC777 ReferenceToken Contract
 /// @author Jordi Baylina, Jacques Dafflon
@@ -8,8 +9,6 @@
 ///  of ERC777 with ERC20 compatible.
 ///  This contract does not define any standard, but can be taken as a reference
 ///  implementation in case of any ambiguity into the standard
-
-pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
 
 import "eip820/contracts/ERC820Implementer.sol";
 import "giveth-common-contracts/contracts/Owned.sol";

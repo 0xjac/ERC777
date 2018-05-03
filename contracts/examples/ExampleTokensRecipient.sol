@@ -1,8 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-pragma solidity ^0.4.19; // solhint-disable-line compiler-fixed
+pragma solidity 0.4.21;
 
 import "../ERC777TokensRecipient.sol";
 import "eip820/contracts/ERC820Implementer.sol";
