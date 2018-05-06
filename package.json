@@ -19,7 +19,7 @@
     "lint:js": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
     "lint": "npm run lint:sol && npm run lint:js",
     "build:sol": "truffle compile",
-    "build": "npm run clean && npm run build:sol",
+    "build": "npm run clean && truffle compile --all",
     "test": "scripts/test.sh --network 'test'",
     "check": "npm run lint && npm run build && npm run test",
     "clean": "rm -rf ./build",

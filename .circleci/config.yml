@@ -1,0 +1,129 @@
+aliases:
+  - &update-npm
+    name: Update npm to the latest version
+    command: sudo npm install -g npm@latest
+
+  - &save-dependencies-cache
+    key: v1-dependency-cache-{{ checksum "package.json" }}
+    paths:
+      - ./node_modules
+
+  - &restore-dependencies-cache
+    keys:
+      - v1-dependency-cache-{{ checksum "package.json" }}
+      - v1-dependency-cache-
+
+  - &save-build-cache
+    key: v1-build-cache-{{ .BuildNum }}
+    paths:
+      - ./build
+
+  - &restore-build-cache
+    keys:
+      - v1-build-cache-{{ .BuildNum }}
+      - v1-build-cache-
+  - &filter-all-tags
+    tags:
+      only: /.*/
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:8.11.1
+  working_directory: ~/erc777
+
+version: 2
+
+jobs:
+  install-dependencies:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - run:
+          name: Install npm dependencies with npm ci
+          command: npm ci
+      - save_cache: *save-dependencies-cache
+  build:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - run:
+          name: Build Solidity
+          command: npm run build
+      - save_cache: *save-build-cache
+  lint-solidity:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - run:
+          name: Lint Solidity
+          command: npm run lint:sol
+  lint-javascript:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - run:
+          name: Lint Javascript
+          command: npm run lint:js
+  test:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - restore_cache: *restore-build-cache
+      - run:
+          name: Test
+          command: npm run test
+  publish:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - restore_cache: *restore-build-cache
+      - run:
+          name: Set npm auth token
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Publish to npm
+          command: npm publish
+
+workflows:
+  version: 2
+  ci_cd:
+    jobs:
+      - install-dependencies:
+          filters: *filter-all-tags
+      - build:
+          requires:
+            - install-dependencies
+          filters: *filter-all-tags
+      - lint-solidity:
+          requires:
+            - install-dependencies
+          filters: *filter-all-tags
+      - lint-javascript:
+          requires:
+            - install-dependencies
+          filters: *filter-all-tags
+      - test:
+          requires:
+            - build
+          filters: *filter-all-tags
+      - publish:
+          requires:
+            - build
+            - test
+            - lint-solidity
+            - lint-javascript
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
