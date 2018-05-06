@@ -25,6 +25,11 @@
     "clean": "rm -rf ./build",
     "prepublishOnly": "npm install && npm run build"
   },
+  "files": [
+    "build",
+    "contracts",
+    "logo"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jacquesd/ERC777.git"
