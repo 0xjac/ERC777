@@ -1,7 +1,7 @@
 # ERC777
 [![Build Status](https://travis-ci.org/jacquesd/ERC777.svg?branch=master)](https://travis-ci.org/jacquesd/ERC777)
 [![License](https://img.shields.io/github/license/jacquesd/ERC777.svg)](https://github.com/jacquesd/ERC777/blob/master/LICENSE)
-[![npm version](https://badge.fury.io/js/ERC777.svg)](https://www.npmjs.com/package/ERC777)
+[![npm version](https://badge.fury.io/js/erc777.svg)](https://www.npmjs.com/package/erc777)
 
 *A New Advanced Token Standard for Ethereum Token*
 
