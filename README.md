@@ -23,6 +23,12 @@ A copy of the specification can be found in this repository at [`eip-777.md`](ei
 ## Reference Implementation
 The reference implementation is available at: [contracts/examples/ReferenceToken.sol](contracts/examples/ReferenceToken.sol)
 
+This repository including the specification and the reference implementation can be installed via `npm` with:
+
+``` bash
+npm install erc777
+```
+
 ## Logo
 
 > The logo MUST NOT be used to advertise, promote or associate in any way technology – such as tokens – which is not ERC777 compliant.
