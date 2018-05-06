@@ -1,3 +1,6 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this
+     file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 # Contributing
 
 Contributions for the community are essential to create a great and better token standard. All suggestions are welcome and we will do our best to review them quickly and if satisfactory, to integrate them into the standard.
