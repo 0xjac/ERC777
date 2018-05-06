@@ -18,8 +18,9 @@ To optimize this process and increase the chances of accepting your suggestion, 
 ### Submitting Code
 
 1. Make sure it is lint properly with:
-   - `npm run js-lint` for javascript
-   - `npm run sol-lint` for solidity
+   - `npm run lint:js` for javascript
+   - `npm run lint:sol` for solidity  
+   > Use `npm run lint` to lint both javascript and solidity
 2. Provide tests for your code and ensure they run and pass with `npm run test`.
 3. Make sure you don't break anything:
    - The solidity code must builds properly with `npm run build`

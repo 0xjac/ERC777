@@ -15,15 +15,15 @@
     "test": "test"
   },
   "scripts": {
+    "lint:sol": "npx solhint --formatter ../../../eslint-formatter-stylish-verbose 'contracts/**/*.sol'",
+    "lint:js": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
+    "lint": "npm run lint:sol && npm run lint:js",
+    "build:sol": "truffle compile",
+    "build": "npm run clean && npm run build:sol",
     "test": "scripts/test.sh --network 'test'",
-    "sol-compile": "truffle compile",
-    "sol-lint": "npx solhint --formatter ../../../eslint-formatter-stylish-verbose 'contracts/**/*.sol'",
-    "js-lint": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
-    "lint": "npm run sol-lint && npm run js-lint",
     "check": "npm run lint && npm run build && npm run test",
-    "build": "npm run clean && npm run sol-compile",
-    "prepublishOnly": "npm install && npm run build",
-    "clean": "rm -rf ./build"
+    "clean": "rm -rf ./build",
+    "prepublishOnly": "npm install && npm run build"
   },
   "repository": {
     "type": "git",
