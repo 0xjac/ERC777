@@ -31,8 +31,9 @@ To optimize this process and increase the chances of accepting your suggestion, 
 5. Write a [good commit messages](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html):
    - Capitalized, short (50 chars or less) summary
    - Optionally, one blank line followed by a more detailed explanation
-6. Submitted your changes via [a pull request (PR)](https://github.com/jacquesd/ERC777/pulls) from your fork of the repository and detail the changes in the description.
-7. Make sure your pull request is up to date with [master](https://github.com/jacquesd/ERC777/commits/master).
+6. Document your changes in `CHANGELOG.md` under the [Unreleased section](CHANGELOG.md#Unreleased).
+7. Submitted your changes via [a pull request (PR)](https://github.com/jacquesd/ERC777/pulls) from your fork of the repository and detail the changes in the description.
+8. Make sure your pull request is up to date with [master](https://github.com/jacquesd/ERC777/commits/master).
 
 ## What should I do if....
 
