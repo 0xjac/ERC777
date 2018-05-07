@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [README]: EIP badge with link to the official EIP
+
+### Changed
+- Fix typos in [README]
+
 ## [0.1.1] - 2018-05-07
 
 ### Added
