@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changelog based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Include built files, contracts and logo in npm package
 - Logo badge in the [README]
+- Solidity badge in the [README]
 - Missing License header
 - Npm installation instructions in [README]
 - Solidty language linting
