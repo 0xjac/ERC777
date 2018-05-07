@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2018-05-07
+
 ### Added
 - Changelog based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Include built files, contracts and logo in npm package
@@ -39,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Deprecated npm package `eip777` in favor of `erc777`
 
-[Unreleased]: https://github.com/jacquesd/ERC777/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/jacquesd/ERC777/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/jacquesd/ERC777/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/jacquesd/ERC777/compare/v0.0.8...v0.1.0
 [README]: README.md
