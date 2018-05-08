@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - [README]: EIP badge with link to the official EIP
+- Coverage information with minimum threshold of 95%
+- Integration of coverage with CI and reporting via codecov.io
+- Coverage badge
+- Contract deployment in test using web3.js 1.0.0
+- More tests
 
 ### Changed
 - Fix typos in [README]
