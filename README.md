@@ -1,5 +1,6 @@
 # ERC777
 [![Build Status](https://img.shields.io/circleci/project/github/jacquesd/ERC777/master.svg?style=flat-square)](https://circleci.com/gh/jacquesd/ERC777)
+[![Coverage](https://img.shields.io/codecov/c/github/jacquesd/ERC777/master.svg?style=flat-square)](https://codecov.io/gh/jacquesd/ERC777)
 [![License](https://img.shields.io/github/license/jacquesd/ERC777.svg?style=flat-square)](https://github.com/jacquesd/ERC777/blob/master/LICENSE)
 [![npm version](https://img.shields.io/npm/v/erc777.svg?style=flat-square)](https://www.npmjs.com/package/erc777)
 [![npm downloads](https://img.shields.io/npm/dt/erc777.svg?style=flat-square)](https://www.npmjs.com/package/erc777)
