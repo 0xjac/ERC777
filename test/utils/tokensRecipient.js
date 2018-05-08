@@ -30,6 +30,10 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, recipient.options.address, 0);
       assert.isFalse(await recipient.methods.notified().call());
 
+      await recipient.methods
+        .acceptTokens()
+        .send({ gas: 300000, from: accounts[4] });
+
       await token.contract.methods
         .send(recipient.options.address, web3.utils.toWei('1.22'))
         .send({ gas: 300000, from: accounts[5] });
@@ -65,8 +69,35 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
     });
-    
+
     it.skip('should call "TokensRecipient" for ' +
       `${utils.formatAccount(accounts[4])}`);
+
+    it('should not send tokens to a contract ' +
+      'without TokensRecipient', async function() {
+      // must be redeployed without registering with EIP820 for this test
+      recipient = await ExampleTokensRecipient
+        .deploy({ arguments: [false] })
+        .send({ from: accounts[4], gasLimit: 4712388 });
+      assert.ok(recipient.options.address);
+
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[5], 10);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+      assert.isFalse(await recipient.methods.notified().call());
+
+      await token.contract.methods
+        .send(recipient.options.address, web3.utils.toWei('1.22'))
+        .send({ gas: 300000, from: accounts[5] })
+        .should.be.rejectedWith('revert');
+
+      await utils.getBlock(web3);
+
+      // revert will prevent setting notified to true
+      assert.isFalse(await recipient.methods.notified().call());
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[5], 10);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+    });
   });
 };

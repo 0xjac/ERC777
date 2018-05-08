@@ -23,7 +23,25 @@ exports.test = function(web3, accounts, token) {
         await utils.getBlock(web3);
         await utils.assertBalance(web3, token, accounts[1], 7);
         await utils.assertTotalSupply(web3, token, 97);
-      });
+      }
+    );
+
+    it(`should burn 3 ${token.symbol} of ${utils.formatAccount(accounts[1])}` +
+      '(ERC20 Disabled)', async function() {
+      await utils.assertBalance(web3, token, accounts[1], 10);
+
+      await token.disableERC20();
+
+      await token.contract.methods
+        .burn(accounts[1], web3.utils.toWei('3'), '0x', '0x')
+        .send({ gas: 300000, from: accounts[0] });
+
+      await utils.getBlock(web3);
+
+      // TODO check events
+      await utils.assertBalance(web3, token, accounts[1], 7);
+      await utils.assertTotalSupply(web3, token, 97);
+    });
 
     it(`should not burn 11 ${token.symbol} of ` +
       `${utils.formatAccount(accounts[1])} ` +
