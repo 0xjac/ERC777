@@ -143,6 +143,7 @@ workflows:
           requires:
             - build
             - test
+            - coverage
             - lint-solidity
             - lint-javascript
           filters:
