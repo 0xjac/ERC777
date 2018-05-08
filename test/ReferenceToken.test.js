@@ -59,6 +59,20 @@ contract('ReferenceToken', function(accounts) {
     };
   });
 
+  describe('Creation', function() {
+    it('should not deploy the token with a ' +
+      'granularity of 0', async function() {
+      await ReferenceToken
+        .deploy({ arguments: [
+          token.name,
+          token.symbol,
+          web3.utils.toWei('0'),
+        ] })
+        .send({ from: accounts[0], gasLimit: 8000000 })
+        .should.be.rejectedWith('revert');
+    });
+  });
+
   require('./utils/attributes').test(web3, accounts, token);
   require('./utils/mint').test(web3, accounts, token);
   require('./utils/burn').test(web3, accounts, token);
