@@ -80,6 +80,25 @@ jobs:
       - run:
           name: Test
           command: npm run test
+  coverage:
+    <<: *defaults
+    steps:
+      - run: *update-npm
+      - checkout
+      - restore_cache: *restore-dependencies-cache
+      - restore_cache: *restore-build-cache
+      - run:
+          name: Tests with coverage
+          command: npm run coverage
+      - run:
+          name: Install codecov
+          command: npm install codecov
+      - run:
+          name: Report coverage to codecov.io
+          command: npx codecov
+      - run:
+          name: Enforce minimum coverage threshold
+          command: npx istanbul check-coverage --statements 95 --functions 95 --branches 95 --lines 95
   publish:
     <<: *defaults
     steps:
@@ -113,6 +132,10 @@ workflows:
             - install-dependencies
           filters: *filter-all-tags
       - test:
+          requires:
+            - build
+          filters: *filter-all-tags
+      - coverage:
           requires:
             - build
           filters: *filter-all-tags
