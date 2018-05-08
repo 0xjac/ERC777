@@ -53,8 +53,8 @@ contract('ReferenceToken', function(accounts) {
   require('./utils/burn').test(web3, accounts, token);
   require('./utils/send').test(web3, accounts, token);
   require('./utils/operator').test(web3, accounts, token);
-  require('./utils/tokenSender').test(web3, accounts, token);
-  require('./utils/tokenReceiver').test(web3, accounts, token);
+  require('./utils/tokensSender').test(web3, accounts, token);
+  require('./utils/tokensRecipient').test(web3, accounts, token);
   require('./utils/erc20Compatibility').test(web3, accounts, token);
 
   describe('ERC20 Disable', function() {
