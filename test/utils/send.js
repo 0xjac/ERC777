@@ -12,8 +12,9 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    it(`should let ${accounts[1].slice(0, 8)} send 3 ${token.symbol} to ` +
-      `${accounts[2].slice(0, 8)}`, async function() {
+    it(`should let ${utils.formatAccount(accounts[1])} ` +
+      `send 3 ${token.symbol} ` +
+      `to ${utils.formatAccount(accounts[2])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -28,8 +29,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 13);
     });
 
-    it(`should not let ${accounts[1].slice(0, 8)} send 11 ${token.symbol} ` +
-      '(not enough funds)', async function() {
+    it(`should not let ${utils.formatAccount(accounts[1])} ` +
+      `send 11 ${token.symbol} (not enough funds)`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -45,8 +46,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
-    it(`should not let ${accounts[1].slice(0, 8)} send -3 ${token.symbol} ` +
-      '(negative amount)', async function() {
+    it(`should not let ${utils.formatAccount(accounts[1])} ` +
+      `send -3 ${token.symbol} (negative amount)`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -62,8 +63,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
-    it(`should not let ${accounts[1].slice(0, 8)} send 0.007 ${token.symbol} ` +
-      '(< granulairty)', async function() {
+    it(`should not let ${utils.formatAccount(accounts[1])} ` +
+      `send 0.007 ${token.symbol} (< granulairty)`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);

@@ -31,8 +31,9 @@ exports.test = function(web3, accounts, token) {
       await utils.log(`decimals: ${decimals}`);
     });
 
-    it(`should let ${accounts[2].slice(0, 8)} transfer 1.5 ${token.symbol} ` +
-      `to ${accounts[1].slice(0, 8)}`, async function() {
+    it(`should let ${utils.formatAccount(accounts[2])} ` +
+      `transfer 1.5 ${token.symbol} ` +
+      `to ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -47,8 +48,9 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 8.5);
     });
 
-    it(`should approve ${accounts[3].slice(0, 8)} to send 3.5 ${token.symbol}` +
-      ` from ${accounts[1].slice(0, 8)}`, async function() {
+    it(`should approve ${utils.formatAccount(accounts[3])} ` +
+      `to send 3.5 ${token.symbol}` +
+      ` from ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -70,8 +72,9 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
-    it(`should let ${accounts[3].slice(0, 8)} transfer 3 ${token.symbol} ` +
-      `from ${accounts[1].slice(0, 8)}`, async function() {
+    it(`should let ${utils.formatAccount(accounts[3])} ` +
+      `transfer 3 ${token.symbol} ` +
+      `from ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -98,8 +101,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 13);
     });
 
-    it(`should not let ${accounts[3].slice(0, 8)} transfer from ` +
-      `${accounts[1].slice(0, 8)} (not approved)`, async function() {
+    it(`should not let ${utils.formatAccount(accounts[3])} transfer from ` +
+      `${utils.formatAccount(accounts[1])} (not approved)`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);

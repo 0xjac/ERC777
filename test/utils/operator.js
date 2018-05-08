@@ -13,8 +13,8 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    it(`should detect ${accounts[3].slice(0, 8)} is not an operator for ` +
-    `${accounts[1].slice(0, 8)}`, async function() {
+    it(`should detect ${utils.formatAccount(accounts[3])} is not an operator ` +
+      `for ${utils.formatAccount(accounts[1])}`, async function() {
       assert.isFalse(
         await token.contract.methods
           .isOperatorFor(accounts[3], accounts[1])
@@ -22,8 +22,8 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should authorize ${accounts[3].slice(0, 8)} as an operator for ` +
-    `${accounts[1].slice(0, 8)}`, async function() {
+    it(`should authorize ${utils.formatAccount(accounts[3])} as an operator ` +
+      `for ${utils.formatAccount(accounts[1])}`, async function() {
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
@@ -35,9 +35,9 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should let ${accounts[3].slice(0, 8)} send 1.12 ${token.symbol} ` +
-      `from ${accounts[1].slice(0, 8)} to ` +
-      `${accounts[2].slice(0, 8)}`, async function() {
+    it(`should let ${utils.formatAccount(accounts[3])} ` +
+      `send 1.12 ${token.symbol} from ${utils.formatAccount(accounts[1])} ` +
+      `to ${utils.formatAccount(accounts[2])}`, async function() {
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
@@ -57,8 +57,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 11.12);
     });
 
-    it(`should revoke ${accounts[3].slice(0, 8)} as an operator for ` +
-      `${accounts[1].slice(0, 8)}`, async function() {
+    it(`should revoke ${utils.formatAccount(accounts[3])} as an operator for ` +
+      `${utils.formatAccount(accounts[1])}`, async function() {
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
@@ -81,8 +81,8 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should not let ${accounts[3].slice(0, 8)} send from ` +
-      `${accounts[1].slice(0, 8)} (not operator)`, async function() {
+    it(`should not let ${utils.formatAccount(accounts[3])} send from ` +
+      `${utils.formatAccount(accounts[1])} (not operator)`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);

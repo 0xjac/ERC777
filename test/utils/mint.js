@@ -7,7 +7,7 @@ const utils = require('./index');
 
 exports.test = function(web3, accounts, token) {
   describe('minting', function() {
-    it(`should mint 10 ${token.symbol} for ${accounts[1].slice(0, 8)}`,
+    it(`should mint 10 ${token.symbol} for ${utils.formatAccount(accounts[1])}`,
       async function() {
         await utils.assertBalance(web3, token, accounts[1], 0);
 

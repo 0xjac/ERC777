@@ -21,8 +21,9 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
     });
 
-    it(`should not let ${accounts[2].slice(0, 8)} transfer 3 ` +
-      `${token.symbol} to ${accounts[1].slice(0, 8)}`, async function() {
+    it(`should not let ${utils.formatAccount(accounts[2])} ` +
+      `transfer 3 ${token.symbol} ` +
+      `to ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
@@ -38,8 +39,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
-    it(`should not approve ${accounts[3].slice(0, 8)} to transfer from ` +
-      `${accounts[1].slice(0, 8)}`, async function() {
+    it(`should not approve ${utils.formatAccount(accounts[3])} to transfer ` +
+      `from ${utils.formatAccount(accounts[1])}`, async function() {
       await token.contract.methods
         .approve(accounts[3], web3.utils.toWei('3.5'))
         .send({ gas: 300000, from: accounts[1] })
@@ -51,8 +52,9 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
     });
 
-    it(`should not let ${accounts[3].slice(0, 8)} send 1 ${token.symbol} ` +
-      `from ${accounts[1].slice(0, 8)}`, async function() {
+    it(`should not let ${utils.formatAccount(accounts[3])} ` +
+      `transfer 1 ${token.symbol} ` +
+      `from ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);

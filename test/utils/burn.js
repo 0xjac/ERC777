@@ -12,7 +12,7 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    it(`should burn 3 ${token.symbol} for ${accounts[1].slice(0, 8)}`,
+    it(`should burn 3 ${token.symbol} of ${utils.formatAccount(accounts[1])}`,
       async function() {
         await utils.assertBalance(web3, token, accounts[1], 10);
 
@@ -25,7 +25,8 @@ exports.test = function(web3, accounts, token) {
         await utils.assertTotalSupply(web3, token, 97);
       });
 
-    it(`should not burn 11 ${token.symbol} for ${accounts[1].slice(0, 8)} ` +
+    it(`should not burn 11 ${token.symbol} of ` +
+      `${utils.formatAccount(accounts[1])} ` +
       '(not enough funds)', async function() {
       await utils.assertBalance(web3, token, accounts[1], 10);
 
@@ -39,7 +40,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertTotalSupply(web3, token, 100);
     });
 
-    it(`should not let ${accounts[1].slice(0, 8)} burn -3 ${token.symbol} ` +
+    it(`should not burn -3 ${token.symbol} of ` +
+      `${utils.formatAccount(accounts[1])} ` +
       '(negative amount)', async function() {
       await utils.assertBalance(web3, token, accounts[1], 10);
 
@@ -53,8 +55,8 @@ exports.test = function(web3, accounts, token) {
       await utils.assertTotalSupply(web3, token, 100);
     });
 
-    it(`should not let ${accounts[1].slice(0, 8)} burn 0.007 ${token.symbol} ` +
-      '(< granulairty)', async function() {
+    it(`should burn 0.007 ${token.symbol} of ` +
+      `${utils.formatAccount(accounts[1])} (< granulairty)`, async function() {
       await utils.assertBalance(web3, token, accounts[1], 10);
 
       await token.contract.methods
