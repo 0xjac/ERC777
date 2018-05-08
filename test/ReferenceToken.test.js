@@ -1,13 +1,16 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+const { URL } = require('url');
 const Web3 = require('web3');
 const EIP820Registry = require('eip820');
 const ReferenceToken = artifacts.require('ReferenceToken');
 const utils = require('./utils');
 
 contract('ReferenceToken', function(accounts) {
-  const web3 = new Web3('ws://127.0.0.1:8545');
+  const provider = new URL(this.web3.currentProvider.host);
+  provider.protocol = 'ws';
+  const web3 = new Web3(provider.toString());
 
   let token = {
     name: 'ReferenceToken',
@@ -26,7 +29,7 @@ contract('ReferenceToken', function(accounts) {
       token.name,
       token.symbol,
       web3.utils.toWei(token.granularity),
-      { from: accounts[0], gasPrice: 100000000000, gasLimit: 800000 }
+      { from: accounts[0], gasLimit: 800000 }
     );
     // Use Web3.js 1.0
     token.contract = new web3.eth
