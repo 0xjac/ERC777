@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 pragma solidity 0.4.21;
 
-import "eip820/contracts/ERC820Implementer.sol";
-import "eip820/contracts/ERC820ImplementerInterface.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../ERC777TokensRecipient.sol";
+import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
+import { ERC820ImplementerInterface } from "eip820/contracts/ERC820ImplementerInterface.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { ERC777TokensRecipient } from "../ERC777TokensRecipient.sol";
 
 
 contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface, ERC777TokensRecipient, Ownable {

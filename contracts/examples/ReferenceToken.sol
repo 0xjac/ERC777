@@ -10,13 +10,13 @@ pragma solidity 0.4.21;
 ///  This contract does not define any standard, but can be taken as a reference
 ///  implementation in case of any ambiguity into the standard
 
-import "eip820/contracts/ERC820Implementer.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../ERC20Token.sol";
-import "../ERC777Token.sol";
-import "../ERC777TokensSender.sol";
-import "../ERC777TokensRecipient.sol";
+import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { ERC20Token } from "../ERC20Token.sol";
+import { ERC777Token } from "../ERC777Token.sol";
+import { ERC777TokensSender } from "../ERC777TokensSender.sol";
+import { ERC777TokensRecipient } from "../ERC777TokensRecipient.sol";
 
 
 contract ReferenceToken is Ownable, ERC20Token, ERC777Token, ERC820Implementer {
