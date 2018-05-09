@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Fix typos in [README]
+- Use cleaner imports in Solidity
 
 ## [0.1.1] - 2018-05-07
 
