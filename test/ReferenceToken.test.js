@@ -62,13 +62,14 @@ contract('ReferenceToken', function(accounts) {
   describe('Creation', function() {
     it('should not deploy the token with a ' +
       'granularity of 0', async function() {
+      const estimateGas = await deployContract.estimateGas();
       await ReferenceToken
         .deploy({ arguments: [
           token.name,
           token.symbol,
           web3.utils.toWei('0'),
         ] })
-        .send({ from: accounts[0], gasLimit: 8000000 })
+        .send({ from: accounts[0], gasLimit: estimateGas })
         .should.be.rejectedWith('revert');
     });
   });
