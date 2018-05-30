@@ -12,6 +12,11 @@
 
 This standard defines a new way to interact with a Token Contract. This standard takes advantage of [ERC820](https://github.com/ethereum/EIPs/issues/820).
 
+> :warning: **This code has not been reviewed or audited.** :warning:
+>
+> Please review ***all*** the code you use in your token-related project including the code provided here.
+> The code here is provided "*as is*" without warranty of any kind and The authors are not liable as [mentioned in the license](https://github.com/jacquesd/ERC777/blob/master/LICENSE#L261-L301).
+
 ## Proposal
 The official proposal can be found at: [eips.ethereum.org/EIPS/eip-777](https://eips.ethereum.org/EIPS/eip-777).
 
