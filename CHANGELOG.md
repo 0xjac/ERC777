@@ -8,8 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
 - Broaden the Solidity version pragma to ^0.4.21
 - Set cache of shield.io badges to 1h
+- Use master/devel branch instead of master
+- Cleanup CONTRIBUTING.md
 
 ### Added
 - [README]: EIP badge with link to the official EIP
