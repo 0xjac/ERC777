@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Broaden the Solidity version pragma to ^0.4.21
+- Set cache of shield.io badges to 1h
 
 ### Added
 - [README]: EIP badge with link to the official EIP
