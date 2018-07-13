@@ -23,8 +23,7 @@
     "test": "scripts/test.sh --network 'test'",
     "coverage": "SOLIDITY_COVERAGE=true scripts/test.sh",
     "check": "npm run lint && npm run build && npm run test",
-    "clean": "rm -rf ./build",
-    "prepublishOnly": "npm install && npm run build"
+    "clean": "rm -rf ./build ./coverage ./coverage.json"
   },
   "files": [
     "build",
