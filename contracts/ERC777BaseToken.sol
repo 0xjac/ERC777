@@ -22,18 +22,25 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     mapping(address => uint) internal mBalances;
     mapping(address => mapping(address => bool)) internal mAuthorized;
 
+    address[] internal mDefaultOperators;
+    mapping(address => bool) internal mIsDefaultOperator;
+    mapping(address => mapping(address => bool)) internal mRevokedDefaultOperator;
+
     /* -- Constructor -- */
     //
     /// @notice Constructor to create a ReferenceToken
     /// @param _name Name of the new token
     /// @param _symbol Symbol of the new token.
     /// @param _granularity Minimum transferable chunk.
-    function ERC777BaseToken(string _name, string _symbol, uint256 _granularity) internal {
+    function ERC777BaseToken(string _name, string _symbol, uint256 _granularity, address[] _defaultOperators) internal {
         mName = _name;
         mSymbol = _symbol;
         mTotalSupply = 0;
         require(_granularity >= 1);
         mGranularity = _granularity;
+
+        mDefaultOperators = _defaultOperators;
+        for (uint256 i = 0; i < mDefaultOperators.length; i++) { mIsDefaultOperator[mDefaultOperators[i]] = true; }
 
         setInterfaceImplementation("ERC777Token", this);
     }
@@ -57,6 +64,10 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @return the balance of `_tokenAddress`.
     function balanceOf(address _tokenHolder) public constant returns (uint256) { return mBalances[_tokenHolder]; }
 
+    /// @notice Return the list of default operators
+    /// @return the list of all the default operators
+    function defaultOperators() public view returns (address[]) { return mDefaultOperators; }
+
     /// @notice Send `_amount` of tokens to address `_to` passing `_userData` to the recipient
     /// @param _to The address of the recipient
     /// @param _amount The number of tokens to be sent
@@ -68,7 +79,11 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @param _operator The operator that wants to be Authorized
     function authorizeOperator(address _operator) public {
         require(_operator != msg.sender);
-        mAuthorized[_operator][msg.sender] = true;
+        if (mIsDefaultOperator[_operator]) {
+            mRevokedDefaultOperator[_operator][msg.sender] = false;
+        } else {
+            mAuthorized[_operator][msg.sender] = true;
+        }
         AuthorizedOperator(_operator, msg.sender);
     }
 
@@ -76,7 +91,11 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @param _operator The operator that wants to be Revoked
     function revokeOperator(address _operator) public {
         require(_operator != msg.sender);
-        mAuthorized[_operator][msg.sender] = false;
+        if (mIsDefaultOperator[_operator]) {
+            mRevokedDefaultOperator[_operator][msg.sender] = true;
+        } else {
+            mAuthorized[_operator][msg.sender] = false;
+        }
         RevokedOperator(_operator, msg.sender);
     }
 
@@ -85,7 +104,9 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @param _tokenHolder address which holds the tokens to be managed
     /// @return `true` if `_operator` is authorized for `_tokenHolder`
     function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
-        return _operator == _tokenHolder || mAuthorized[_operator][_tokenHolder];
+        return (_operator == _tokenHolder
+            || mAuthorized[_operator][_tokenHolder]
+            || (mIsDefaultOperator[_operator] && !mRevokedDefaultOperator[_operator][_tokenHolder]));
     }
 
     /// @notice Send `_amount` of tokens on behalf of the address `from` to the address `to`.
