@@ -21,8 +21,10 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     function ReferenceToken(
         string _name,
         string _symbol,
-        uint256 _granularity
-    ) public ERC777ERC20BaseToken(_name, _symbol, _granularity) { // solhint-disable-line no-empty-blocks
+        uint256 _granularity,
+        address[] _defaultOperators
+        // solhint-disable-next-line no-empty-blocks
+    ) public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators) {
         // insert custom constructor code
     }
 

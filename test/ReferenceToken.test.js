@@ -23,6 +23,10 @@ contract('ReferenceToken', function(accounts) {
     name: 'ReferenceToken',
     symbol: 'XRT',
     granularity: '0.01',
+    defaultOperators: [
+      '0xcafe000000000000000000000000000000000001',
+      '0x00bacafe00000000000000000000000000000002',
+    ],
     totalSupply: '0',
     defaultBalance: '0',
   };
@@ -32,6 +36,7 @@ contract('ReferenceToken', function(accounts) {
       token.name,
       token.symbol,
       web3.utils.toWei(token.granularity),
+      token.defaultOperators,
     ] });
 
   after(async function() { await web3.currentProvider.connection.close(); });
@@ -68,6 +73,7 @@ contract('ReferenceToken', function(accounts) {
           token.name,
           token.symbol,
           web3.utils.toWei('0'),
+          token.defaultOperators,
         ] })
         .send({ from: accounts[0], gasLimit: estimateGas })
         .should.be.rejectedWith('revert');
