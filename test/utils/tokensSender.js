@@ -44,7 +44,7 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[4] });
 
       await token.contract.methods
-        .send(accounts[5], web3.utils.toWei('1.22'))
+        .send(accounts[5], web3.utils.toWei('1.22'), '0x')
         .send({ gas: 300000, from: accounts[4] });
 
       await utils.getBlock(web3);
@@ -68,7 +68,7 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[4] });
 
       await token.contract.methods
-        .send(accounts[5], web3.utils.toWei('1.22'))
+        .send(accounts[5], web3.utils.toWei('1.22'), '0x')
         .send({ gas: 300000, from: accounts[4] })
         .should.be.rejectedWith('revert');
 

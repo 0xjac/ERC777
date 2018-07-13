@@ -57,13 +57,6 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @return the balance of `_tokenAddress`.
     function balanceOf(address _tokenHolder) public constant returns (uint256) { return mBalances[_tokenHolder]; }
 
-    /// @notice Send `_amount` of tokens to address `_to`
-    /// @param _to The address of the recipient
-    /// @param _amount The number of tokens to be sent
-    function send(address _to, uint256 _amount) public {
-        doSend(msg.sender, _to, _amount, "", msg.sender, "", true);
-    }
-
     /// @notice Send `_amount` of tokens to address `_to` passing `_userData` to the recipient
     /// @param _to The address of the recipient
     /// @param _amount The number of tokens to be sent

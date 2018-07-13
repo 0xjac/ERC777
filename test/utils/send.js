@@ -13,14 +13,14 @@ exports.test = function(web3, accounts, token) {
     });
 
     it(`should let ${utils.formatAccount(accounts[1])} ` +
-      `send 3 ${token.symbol} ` +
+      `send 3 ${token.symbol} with empty data ` +
       `to ${utils.formatAccount(accounts[2])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
-        .send(accounts[2], web3.utils.toWei('3'))
+        .send(accounts[2], web3.utils.toWei('3'), '0x')
         .send({ gas: 300000, from: accounts[1] });
 
       await utils.getBlock(web3);
@@ -30,7 +30,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it(`should let ${utils.formatAccount(accounts[1])} ` +
-      `send 3 ${token.symbol} wtih data ` +
+      `send 3 ${token.symbol} with data ` +
       `to ${utils.formatAccount(accounts[2])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
@@ -56,7 +56,7 @@ exports.test = function(web3, accounts, token) {
       await token.disableERC20();
 
       await token.contract.methods
-        .send(accounts[2], web3.utils.toWei('3'))
+        .send(accounts[2], web3.utils.toWei('3'), '0x')
         .send({ gas: 300000, from: accounts[1] });
 
       await utils.getBlock(web3);
@@ -74,7 +74,7 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
-        .send(accounts[2], web3.utils.toWei('11'))
+        .send(accounts[2], web3.utils.toWei('11'), '0x')
         .send({ gas: 300000, from: accounts[1] })
         .should.be.rejectedWith('revert');
 
@@ -91,7 +91,7 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
-        .send(accounts[2], web3.utils.toWei('-3'))
+        .send(accounts[2], web3.utils.toWei('-3'), '0x')
         .send({ gas: 300000, from: accounts[1] })
         .should.be.rejectedWith('revert');
 
@@ -108,7 +108,7 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
-        .send(accounts[2], web3.utils.toWei('0.007'))
+        .send(accounts[2], web3.utils.toWei('0.007'), '0x')
         .send({ gas: 300000, from: accounts[1] })
         .should.be.rejectedWith('revert');
 
@@ -126,7 +126,7 @@ exports.test = function(web3, accounts, token) {
 
       await token.contract.methods
         .send('0x0000000000000000000000000000000000000000',
-          web3.utils.toWei('1'))
+          web3.utils.toWei('1'), '0x')
         .send({ gas: 300000, from: accounts[1] })
         .should.be.rejectedWith('revert');
 
