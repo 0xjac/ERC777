@@ -13,9 +13,10 @@ pragma solidity 0.4.21;
 
 
 import { ERC777ERC20BaseToken } from "../ERC777ERC20BaseToken.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract ReferenceToken is ERC777ERC20BaseToken {
+contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
 
     function ReferenceToken(
         string _name,
@@ -23,6 +24,20 @@ contract ReferenceToken is ERC777ERC20BaseToken {
         uint256 _granularity
     ) public ERC777ERC20BaseToken(_name, _symbol, _granularity) { // solhint-disable-line no-empty-blocks
         // insert custom constructor code
+    }
+
+    /// @notice Disables the ERC20 interface. This function can only be called
+    ///  by the owner.
+    function disableERC20() public onlyOwner {
+        mErc20compatible = false;
+        setInterfaceImplementation("ERC20Token", 0x0);
+    }
+
+    /// @notice Re enables the ERC20 interface. This function can only be called
+    ///  by the owner.
+    function enableERC20() public onlyOwner {
+        mErc20compatible = true;
+        setInterfaceImplementation("ERC20Token", this);
     }
 
     /* -- Mint And Burn Functions (not part of the ERC777 standard, only the Events/tokensReceived call are) -- */

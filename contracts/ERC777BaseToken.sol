@@ -4,14 +4,13 @@
 pragma solidity 0.4.21;
 
 import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { ERC777Token } from "./ERC777Token.sol";
 import { ERC777TokensSender } from "./ERC777TokensSender.sol";
 import { ERC777TokensRecipient } from "./ERC777TokensRecipient.sol";
 
 
-contract ERC777BaseToken is Ownable, ERC777Token, ERC820Implementer {
+contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     using SafeMath for uint256;
 
     string internal mName;

@@ -33,20 +33,6 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
         _;
     }
 
-    /// @notice Disables the ERC20 interface. This function can only be called
-    ///  by the owner.
-    function disableERC20() public onlyOwner {
-        mErc20compatible = false;
-        setInterfaceImplementation("ERC20Token", 0x0);
-    }
-
-    /// @notice Re enables the ERC20 interface. This function can only be called
-    ///  by the owner.
-    function enableERC20() public onlyOwner {
-        mErc20compatible = true;
-        setInterfaceImplementation("ERC20Token", this);
-    }
-
     /// @notice For Backwards compatibility
     /// @return The decimls of the token. Forced to 18 in ERC777.
     function decimals() public erc20 constant returns (uint8) { return uint8(18); }
