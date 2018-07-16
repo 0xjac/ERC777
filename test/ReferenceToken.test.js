@@ -23,10 +23,8 @@ contract('ReferenceToken', function(accounts) {
     name: 'ReferenceToken',
     symbol: 'XRT',
     granularity: '0.01',
-    defaultOperators: [
-      '0xcafe000000000000000000000000000000000001',
-      '0x00bacafe00000000000000000000000000000002',
-    ],
+    defaultOperators: [accounts[6], accounts[7]],
+    burnOperator: accounts[8],
     totalSupply: '0',
     defaultBalance: '0',
   };
@@ -37,6 +35,7 @@ contract('ReferenceToken', function(accounts) {
       token.symbol,
       web3.utils.toWei(token.granularity),
       token.defaultOperators,
+      token.burnOperator,
     ] });
 
   after(async function() { await web3.currentProvider.connection.close(); });
@@ -65,8 +64,7 @@ contract('ReferenceToken', function(accounts) {
   });
 
   describe('Creation', function() {
-    it('should not deploy the token with a ' +
-      'granularity of 0', async function() {
+    it('should not deploy the token with a granularity of 0', async function() {
       const estimateGas = await deployContract.estimateGas();
       await ReferenceToken
         .deploy({ arguments: [
@@ -74,6 +72,7 @@ contract('ReferenceToken', function(accounts) {
           token.symbol,
           web3.utils.toWei('0'),
           token.defaultOperators,
+          token.burnOperator,
         ] })
         .send({ from: accounts[0], gasLimit: estimateGas })
         .should.be.rejectedWith('revert');
@@ -85,6 +84,8 @@ contract('ReferenceToken', function(accounts) {
   require('./utils/burn').test(web3, accounts, token);
   require('./utils/send').test(web3, accounts, token);
   require('./utils/operator').test(web3, accounts, token);
+  require('./utils/operatorBurn').test(web3, accounts, token);
+  require('./utils/operatorSend').test(web3, accounts, token);
   require('./utils/tokensSender').test(web3, accounts, token);
   require('./utils/tokensRecipient').test(web3, accounts, token);
   require('./utils/erc20Compatibility').test(web3, accounts, token);

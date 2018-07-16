@@ -113,28 +113,6 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should let ${utils.formatAccount(accounts[3])} ` +
-      `send 1.12 ${token.symbol} from ${utils.formatAccount(accounts[1])} ` +
-      `to ${utils.formatAccount(accounts[2])}`, async function() {
-      await token.contract.methods
-        .authorizeOperator(accounts[3])
-        .send({ from: accounts[1], gas: 300000 });
-
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[1], 10);
-      await utils.assertBalance(web3, token, accounts[2], 10);
-
-      await token.contract.methods
-        .operatorSend(
-          accounts[1], accounts[2], web3.utils.toWei('1.12'), '0x', '0x')
-        .send({ gas: 300000, from: accounts[3] });
-
-      await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[1], 8.88);
-      await utils.assertBalance(web3, token, accounts[2], 11.12);
-    });
-
     it(`should revoke ${utils.formatAccount(accounts[3])} as an operator for ` +
       `${utils.formatAccount(accounts[1])}`, async function() {
       await token.contract.methods
@@ -159,25 +137,7 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should not let ${utils.formatAccount(accounts[3])} send from ` +
-      `${utils.formatAccount(accounts[1])} (not operator)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[1], 10);
-      await utils.assertBalance(web3, token, accounts[2], 10);
-
-      await token.contract.methods
-        .operatorSend(
-          accounts[1], accounts[2], web3.utils.toWei('3.72'), '0x', '0x')
-        .send({ gas: 300000, from: accounts[3] })
-        .should.be.rejectedWith('revert');
-
-      await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[1], 10);
-      await utils.assertBalance(web3, token, accounts[2], 10);
-    });
-
-    it(`should not let ${utils.formatAccount(accounts[3])} authorize himself ` +
+    it(`should not let ${utils.formatAccount(accounts[3])} authorize itself ` +
       'as one of his own operators', async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[3], 10);
@@ -193,7 +153,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it(`should make ${utils.formatAccount(accounts[3])} ` +
-      'an operator for himself by default', async function() {
+      'an operator for itself by default', async function() {
       assert.isTrue(
         await token.contract.methods
           .isOperatorFor(accounts[3], accounts[3])
@@ -201,7 +161,7 @@ exports.test = function(web3, accounts, token) {
       );
     });
 
-    it(`should not let ${utils.formatAccount(accounts[3])} revoke himself ` +
+    it(`should not let ${utils.formatAccount(accounts[3])} revoke itself ` +
       'as one of his own operators', async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[3], 10);
@@ -214,23 +174,6 @@ exports.test = function(web3, accounts, token) {
       await utils.getBlock(web3);
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[3], 10);
-    });
-
-    it(`should let ${utils.formatAccount(accounts[3])} ` +
-      'use operatorSend on himself', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[3], 10);
-      await utils.assertBalance(web3, token, accounts[2], 10);
-
-      await token.contract.methods
-        .operatorSend(
-          accounts[3], accounts[2], web3.utils.toWei('3.72'), '0x', '0x')
-        .send({ gas: 300000, from: accounts[3] });
-
-      await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[3], 6.28);
-      await utils.assertBalance(web3, token, accounts[2], 13.72);
     });
   });
 };
