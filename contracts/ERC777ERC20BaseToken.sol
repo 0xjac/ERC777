@@ -43,7 +43,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     /// @param _amount The number of tokens to be transferred
     /// @return `true`, if the transfer can't be done, it should fail.
     function transfer(address _to, uint256 _amount) public erc20 returns (bool success) {
-        doSend(msg.sender, _to, _amount, "", msg.sender, "", false);
+        doSend(msg.sender, msg.sender, _to, _amount, "", "", false);
         return true;
     }
 
@@ -57,7 +57,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
 
         // Cannot be after doSend because of tokensReceived re-entry
         mAllowed[_from][msg.sender] = mAllowed[_from][msg.sender].sub(_amount);
-        doSend(_from, _to, _amount, "", msg.sender, "", false);
+        doSend(msg.sender, _from, _to, _amount, "", "", false);
         return true;
     }
 
@@ -80,5 +80,20 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     ///  to spend
     function allowance(address _owner, address _spender) public erc20 constant returns (uint256 remaining) {
         return mAllowed[_owner][_spender];
+    }
+
+    function doSend(
+        address _operator,
+        address _from,
+        address _to,
+        uint256 _amount,
+        bytes _userData,
+        bytes _operatorData,
+        bool _preventLocking
+    )
+        internal
+    {
+        super.doSend(_operator, _from, _to, _amount, _userData, _operatorData, _preventLocking);
+        if (mErc20compatible) { Transfer(_from, _to, _amount); }
     }
 }
