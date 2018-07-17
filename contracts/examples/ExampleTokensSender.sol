@@ -29,7 +29,7 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
         address from,
         address to,
         uint amount,
-        bytes userData,
+        bytes holderData,
         bytes operatorData
     )  // solhint-enable no-unused-vars
     public {

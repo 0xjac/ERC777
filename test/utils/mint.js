@@ -23,7 +23,8 @@ exports.test = function(web3, accounts, token) {
     );
 
     it(`should mint 10 ${token.symbol} for ` +
-      `${utils.formatAccount(accounts[1])} (ERC20 disabled)`, async function() {
+      `${utils.formatAccount(accounts[1])} ` +
+      '(ERC20 Disabled)', async function() {
       await utils.assertBalance(web3, token, accounts[1], 0);
 
       await token.disableERC20();

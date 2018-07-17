@@ -162,7 +162,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it(`should not let ${utils.formatAccount(accounts[3])} revoke itself ` +
-      'as one of his own operators', async function() {
+      'as one of its own operators', async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[3], 10);
 

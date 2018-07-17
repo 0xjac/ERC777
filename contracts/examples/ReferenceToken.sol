@@ -62,7 +62,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         if (mErc20compatible) { Transfer(0x0, _tokenHolder, _amount); }
     }
 
-    /// @notice Burns `_amount` tokens from `_tokenHolder`
+    /// @notice Burns `_amount` tokens from `msg.sender`
     ///  Silly example of overriding the `burn` function to only let the owner burn its tokens.
     ///  Do not forget to override the `burn` function in your token contract if you want to prevent users from
     ///  burning their tokens.

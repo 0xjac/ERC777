@@ -32,7 +32,9 @@ exports.test = function(web3, accounts, token) {
       assert.ok(sender.options.address);
     });
 
-    it('should notify the sender before sending tokens', async function() {
+    it('should notify the token holder before sending tokens', async function() {
+      const sender = await deployTokensSender(true, accounts[4]);
+
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);

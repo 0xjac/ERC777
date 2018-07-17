@@ -49,7 +49,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it(`should approve ${utils.formatAccount(accounts[3])} ` +
-      `to send 3.5 ${token.symbol}` +
+      `to transfer 3.5 ${token.symbol}` +
       ` from ${utils.formatAccount(accounts[1])}`, async function() {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
@@ -60,6 +60,7 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[1] });
 
       await utils.getBlock(web3);
+
       const allowance = await token.contract.methods
         .allowance(accounts[1], accounts[3])
         .call();

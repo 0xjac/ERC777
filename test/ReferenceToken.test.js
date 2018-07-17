@@ -14,6 +14,9 @@ contract('ReferenceToken', function(accounts) {
   const provider = new URL(this.web3.currentProvider.host);
   provider.protocol = 'ws';
   const web3 = new Web3(provider.toString());
+
+  accounts = accounts.map(web3.utils.toChecksumAddress); // normalize addresses
+
   const ReferenceToken = new web3.eth.Contract(
     OldReferenceToken.abi,
     { data: OldReferenceToken.bytecode }
