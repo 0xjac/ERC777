@@ -48,21 +48,21 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /* -- ERC777 Interface Implementation -- */
     //
     /// @return the name of the token
-    function name() public constant returns (string) { return mName; }
+    function name() public view returns (string) { return mName; }
 
     /// @return the symbol of the token
-    function symbol() public constant returns (string) { return mSymbol; }
+    function symbol() public view returns (string) { return mSymbol; }
 
     /// @return the granularity of the token
-    function granularity() public constant returns (uint256) { return mGranularity; }
+    function granularity() public view returns (uint256) { return mGranularity; }
 
     /// @return the total supply of the token
-    function totalSupply() public constant returns (uint256) { return mTotalSupply; }
+    function totalSupply() public view returns (uint256) { return mTotalSupply; }
 
     /// @notice Return the account balance of some account
     /// @param _tokenHolder Address for which the balance is returned
     /// @return the balance of `_tokenAddress`.
-    function balanceOf(address _tokenHolder) public constant returns (uint256) { return mBalances[_tokenHolder]; }
+    function balanceOf(address _tokenHolder) public view returns (uint256) { return mBalances[_tokenHolder]; }
 
     /// @notice Return the list of default operators
     /// @return the list of all the default operators
@@ -84,7 +84,7 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
         } else {
             mAuthorizedOperators[_operator][msg.sender] = true;
         }
-        AuthorizedOperator(_operator, msg.sender);
+        emit AuthorizedOperator(_operator, msg.sender);
     }
 
     /// @notice Revoke a third party `_operator`'s rights to manage (send) `msg.sender`'s tokens.
@@ -96,14 +96,14 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
         } else {
             mAuthorizedOperators[_operator][msg.sender] = false;
         }
-        RevokedOperator(_operator, msg.sender);
+        emit RevokedOperator(_operator, msg.sender);
     }
 
     /// @notice Check whether the `_operator` address is allowed to manage the tokens held by `_tokenHolder` address.
     /// @param _operator address to check if it has the right to manage the tokens
     /// @param _tokenHolder address which holds the tokens to be managed
     /// @return `true` if `_operator` is authorized for `_tokenHolder`
-    function isOperatorFor(address _operator, address _tokenHolder) public constant returns (bool) {
+    function isOperatorFor(address _operator, address _tokenHolder) public view returns (bool) {
         return (_operator == _tokenHolder
             || mAuthorizedOperators[_operator][_tokenHolder]
             || (mIsDefaultOperator[_operator] && !mRevokedDefaultOperator[_operator][_tokenHolder]));
@@ -140,10 +140,10 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @notice Check whether an address is a regular address or not.
     /// @param _addr Address of the contract that has to be checked
     /// @return `true` if `_addr` is a regular address (not a contract)
-    function isRegularAddress(address _addr) internal constant returns(bool) {
+    function isRegularAddress(address _addr) internal view returns(bool) {
         if (_addr == 0) { return false; }
         uint size;
-        assembly { size := extcodesize(_addr) } // solhint-disable-line no-inline-assembly
+        assembly { size := extcodesize(_addr) } // solium-disable-line security/no-inline-assembly
         return size == 0;
     }
 
@@ -181,7 +181,7 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
 
         callRecipient(_operator, _from, _to, _amount, _holderData, _operatorData, _preventLocking);
 
-        Sent(_operator, _from, _to, _amount, _holderData, _operatorData);
+        emit Sent(_operator, _from, _to, _amount, _holderData, _operatorData);
     }
 
     /// @notice Helper function actually performing the burning of tokens.
@@ -200,7 +200,7 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
         mTotalSupply = mTotalSupply.sub(_amount);
 
         callSender(_operator, _tokenHolder, 0x0, _amount, _holderData, _operatorData);
-        Burned(_operator, _tokenHolder, _amount, _holderData, _operatorData);
+        emit Burned(_operator, _tokenHolder, _amount, _holderData, _operatorData);
     }
 
     /// @notice Helper function that checks for ERC777TokensRecipient on the recipient and calls it.

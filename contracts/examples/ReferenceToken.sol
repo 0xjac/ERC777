@@ -29,16 +29,16 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         uint256 _granularity,
         address[] _defaultOperators,
         address _burnOperator
-    ) public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators) {
-        mBurnOperator = _burnOperator;
-    }
+    )
+        public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators)
+    { mBurnOperator = _burnOperator; }
 
     /// @notice Disables the ERC20 interface. This function can only be called
     ///  by the owner.
     function disableERC20() public onlyOwner {
         mErc20compatible = false;
         setInterfaceImplementation("ERC20Token", 0x0);
-        ERC20Disabled();
+        emit ERC20Disabled();
     }
 
     /// @notice Re enables the ERC20 interface. This function can only be called
@@ -46,7 +46,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     function enableERC20() public onlyOwner {
         mErc20compatible = true;
         setInterfaceImplementation("ERC20Token", this);
-        ERC20Enabled();
+        emit ERC20Enabled();
     }
 
     /* -- Mint And Burn Functions (not part of the ERC777 standard, only the Events/tokensReceived call are) -- */
@@ -63,8 +63,8 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
 
         callRecipient(msg.sender, 0x0, _tokenHolder, _amount, "", _operatorData, true);
 
-        Minted(msg.sender, _tokenHolder, _amount, _operatorData);
-        if (mErc20compatible) { Transfer(0x0, _tokenHolder, _amount); }
+        emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
+        if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
     }
 
     /// @notice Burns `_amount` tokens from `msg.sender`

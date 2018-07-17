@@ -93,13 +93,13 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
         internal
     {
         super.doSend(_operator, _from, _to, _amount, _holderData, _operatorData, _preventLocking);
-        if (mErc20compatible) { Transfer(_from, _to, _amount); }
+        if (mErc20compatible) { emit Transfer(_from, _to, _amount); }
     }
 
     function doBurn(address _operator, address _tokenHolder, uint256 _amount, bytes _holderData, bytes _operatorData)
         internal
     {
         super.doBurn(_operator, _tokenHolder, _amount, _holderData, _operatorData);
-        if (mErc20compatible) { Transfer(_tokenHolder, 0x0, _amount); }
+        if (mErc20compatible) { emit Transfer(_tokenHolder, 0x0, _amount); }
     }
 }

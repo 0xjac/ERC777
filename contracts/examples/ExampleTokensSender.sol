@@ -32,7 +32,8 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
         bytes holderData,
         bytes operatorData
     )  // solhint-enable no-unused-vars
-    public {
+        public
+    {
         require(allowTokensToSend);
         notified = true;
     }
