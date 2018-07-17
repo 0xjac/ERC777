@@ -18,6 +18,9 @@ import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
 
+    event ERC20Enabled();
+    event ERC20Disabled();
+
     address private mBurnOperator;
 
     function ReferenceToken(
@@ -35,6 +38,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     function disableERC20() public onlyOwner {
         mErc20compatible = false;
         setInterfaceImplementation("ERC20Token", 0x0);
+        ERC20Disabled();
     }
 
     /// @notice Re enables the ERC20 interface. This function can only be called
@@ -42,6 +46,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     function enableERC20() public onlyOwner {
         mErc20compatible = true;
         setInterfaceImplementation("ERC20Token", this);
+        ERC20Enabled();
     }
 
     /* -- Mint And Burn Functions (not part of the ERC777 standard, only the Events/tokensReceived call are) -- */
