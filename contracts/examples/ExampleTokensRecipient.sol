@@ -5,7 +5,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.4.21;
+pragma solidity 0.4.24;
 
 import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
 import { ERC820ImplementerInterface } from "eip820/contracts/ERC820ImplementerInterface.sol";
@@ -18,7 +18,7 @@ contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface
     bool private allowTokensReceived;
     bool public notified;
 
-    function ExampleTokensRecipient(bool _setInterface) public {
+    constructor(bool _setInterface) public {
         if (_setInterface) { setInterfaceImplementation("ERC777TokensRecipient", this); }
         allowTokensReceived = true;
         notified = false;
@@ -34,7 +34,7 @@ contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface
     )  // solhint-enable no-unused-vars
         public
     {
-        require(allowTokensReceived);
+        require(allowTokensReceived, "Receive not allowed");
         notified = true;
     }
 

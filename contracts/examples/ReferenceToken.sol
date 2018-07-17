@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-pragma solidity 0.4.21;
+pragma solidity 0.4.24;
 
 /// @title ERC777 ReferenceToken Contract
 /// @author Jordi Baylina, Jacques Dafflon
@@ -23,7 +23,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
 
     address private mBurnOperator;
 
-    function ReferenceToken(
+    constructor(
         string _name,
         string _symbol,
         uint256 _granularity,
@@ -83,7 +83,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     /// @param _tokenHolder The address that will lose the tokens
     /// @param _amount The quantity of tokens to burn
     function operatorBurn(address _tokenHolder, uint256 _amount, bytes _holderData, bytes _operatorData) public {
-        require(msg.sender == mBurnOperator);
+        require(msg.sender == mBurnOperator, "Not a burn operator");
         super.operatorBurn(_tokenHolder, _amount, _holderData, _operatorData);
     }
 }

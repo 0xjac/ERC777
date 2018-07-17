@@ -55,8 +55,7 @@
   "homepage": "https://github.com/jacquesd/ERC777#readme",
   "dependencies": {
     "eip820": "0.0.20",
-    "openzeppelin-solidity": "1.9.0",
-    "truffle": "4.1.6"
+    "openzeppelin-solidity": "1.9.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -71,10 +70,11 @@
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
     "ganache-cli": "6.1.0",
-    "jshint-esnext": "^2.7.0-3",
     "mocha": "^4.1.0",
-    "solhint": "^1.1.10",
-    "solidity-coverage": "^0.5.0",
+    "sha3": "^1.2.1",
+    "solhint": "^1.2.1",
+    "solidity-coverage": "^0.5.5",
+    "truffle": "4.1.13",
     "web3": "1.0.0-beta.34"
   }
 }

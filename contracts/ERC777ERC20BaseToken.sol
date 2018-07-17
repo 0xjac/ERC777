@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-pragma solidity 0.4.21;
+pragma solidity 0.4.24;
 
 
 import { ERC20Token } from "./ERC20Token.sol";
@@ -13,7 +13,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
 
     mapping(address => mapping(address => uint256)) internal mAllowed;
 
-    function ERC777ERC20BaseToken(
+    constructor(
         string _name,
         string _symbol,
         uint256 _granularity,
@@ -29,7 +29,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     ///  implemented only to maintain backwards compatibility. When the erc20
     ///  compatibility is disabled, this methods will fail.
     modifier erc20 () {
-        require(mErc20compatible);
+        require(mErc20compatible, "ERC20 is disabled");
         _;
     }
 
@@ -52,7 +52,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     /// @param _amount The number of tokens to be transferred
     /// @return `true`, if the transfer can't be done, it should fail.
     function transferFrom(address _from, address _to, uint256 _amount) public erc20 returns (bool success) {
-        require(_amount <= mAllowed[_from][msg.sender]);
+        require(_amount <= mAllowed[_from][msg.sender], "Not enough funds allowed");
 
         // Cannot be after doSend because of tokensReceived re-entry
         mAllowed[_from][msg.sender] = mAllowed[_from][msg.sender].sub(_amount);

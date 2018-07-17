@@ -28,7 +28,7 @@ aliases:
 
 defaults: &defaults
   docker:
-    - image: circleci/node:8.11.1
+    - image: circleci/node:10.6.0
   working_directory: ~/erc777
 
 version: 2

@@ -5,7 +5,7 @@
 * This code has not been reviewed.
 * Do not use or deploy this code before reviewing it personally first.
 */
-pragma solidity 0.4.21;
+pragma solidity 0.4.24;
 
 
 contract Migrations {
