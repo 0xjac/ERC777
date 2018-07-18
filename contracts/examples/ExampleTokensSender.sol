@@ -11,31 +11,47 @@ import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
 import { ERC820ImplementerInterface } from "eip820/contracts/ERC820ImplementerInterface.sol";
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { ERC777TokensSender } from "../ERC777TokensSender.sol";
+import { ERC777Token } from "../ERC777Token.sol";
 
 
 contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, ERC777TokensSender, Ownable {
 
     bool private allowTokensToSend;
-    bool public notified;
+
+    mapping(address => address) public token;
+    mapping(address => address) public operator;
+    mapping(address => address) public from;
+    mapping(address => address) public to;
+    mapping(address => uint256) public amount;
+    mapping(address => bytes) public holderData;
+    mapping(address => bytes) public operatorData;
+    mapping(address => uint256) public balanceOf;
 
     constructor(bool _setInterface) public {
         if (_setInterface) { setInterfaceImplementation("ERC777TokensSender", this); }
         allowTokensToSend = true;
-        notified = false;
     }
 
     function tokensToSend(
-        address operator,   // solhint-disable no-unused-vars
-        address from,
-        address to,
-        uint amount,
-        bytes holderData,
-        bytes operatorData
-    )  // solhint-enable no-unused-vars
+        address _operator,
+        address _from,
+        address _to,
+        uint _amount,
+        bytes _holderData,
+        bytes _operatorData
+    )
         public
     {
         require(allowTokensToSend, "Send not allowed");
-        notified = true;
+        token[_to] = msg.sender;
+        operator[_to] = _operator;
+        from[_to] = _from;
+        to[_to] = _to;
+        amount[_to] = _amount;
+        holderData[_to] = _holderData;
+        operatorData[_to] = _operatorData;
+        balanceOf[_from] = ERC777Token(msg.sender).balanceOf(_from);
+        balanceOf[_to] = ERC777Token(msg.sender).balanceOf(_to);
     }
 
     function acceptTokensToSend() public onlyOwner { allowTokensToSend = true; }

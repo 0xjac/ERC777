@@ -41,8 +41,6 @@ contract('ReferenceToken', function(accounts) {
       token.burnOperator,
     ] });
 
-  after(async function() { await web3.currentProvider.connection.close(); });
-
   beforeEach(async function() {
     let erc820Registry = await EIP820Registry.deploy(web3, accounts[0]);
     assert.ok(erc820Registry.$address);
@@ -59,12 +57,15 @@ contract('ReferenceToken', function(accounts) {
         .send({ gas: 300000, from: accounts[0] });
     };
 
-    token.genMintTxForAccount = function(account, amount, operator, gas) {
-      return token.contract.methods
-        .mint(account, web3.utils.toWei(amount), '0xcafe')
-        .send.request({ gas: gas, from: operator });
+    token.mintForAccount = async function(account, amount, operator) {
+      const mintTx = token.contract.methods
+        .mint(account, web3.utils.toWei(amount), '0xcafe');
+      const gas = await mintTx.estimateGas();
+      await mintTx.send({ gas: gas, from: operator });
     };
   });
+
+  after(async function() { await web3.currentProvider.connection.close(); });
 
   describe('Creation', function() {
     it('should not deploy the token with a granularity of 0', async function() {
@@ -110,8 +111,7 @@ contract('ReferenceToken', function(accounts) {
         .getInterfaceImplementer(token.contract.options.address, erc20Hash)
         .call();
 
-      assert.strictEqual(
-        erc20Addr, '0x0000000000000000000000000000000000000000');
+      assert.strictEqual(erc20Addr, utils.zeroAddress);
     });
   });
 

@@ -82,8 +82,7 @@ exports.test = function(web3, accounts, token) {
         .getInterfaceImplementer(token.contract.options.address, erc20Hash)
         .call();
 
-      assert.strictEqual(
-        erc20Addr, '0x0000000000000000000000000000000000000000');
+      assert.strictEqual(erc20Addr, utils.zeroAddress);
 
       await token.contract.methods
         .enableERC20()

@@ -125,7 +125,7 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
-        .send('0x0000000000000000000000000000000000000000',
+        .send(utils.zeroAddress,
           web3.utils.toWei('1'), '0x')
         .send({ gas: 300000, from: accounts[1] })
         .should.be.rejectedWith('revert');

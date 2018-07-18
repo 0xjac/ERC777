@@ -19,9 +19,11 @@ const testAccounts = [
 const blocks = [];
 let blockIdx = 0;
 
-let log = (msg) => process.env.MOCHA_VERBOSE && console.log(msg);
+const log = (msg) => process.env.MOCHA_VERBOSE && console.log(msg);
+const zeroAddress = '0x0000000000000000000000000000000000000000';
 
 module.exports = {
+  zeroAddress,
   log,
 
   formatAccount(account) {
@@ -56,13 +58,70 @@ module.exports = {
     );
   },
 
-  async mintForAllAccounts(web3, accounts, token, operator, amount, gas) {
-    const mintBatch = new web3.BatchRequest();
+  async mintForAllAccounts(web3, accounts, token, operator, amount) {
+    let erc820Registry = new web3.eth.Contract(
+      ERC820Registry.abi,
+      '0x991a1bcb077599290d7305493c9a630c20f8b798'
+    );
+    let hook;
     for (let account of accounts) {
-      mintBatch.add(
-        token.genMintTxForAccount(account, amount, accounts[0], gas)
-      );
+      hook = await erc820Registry.methods.getInterfaceImplementer(
+        account, web3.utils.keccak256('ERC777TokensRecipient')).call();
+      if (hook === zeroAddress) { hook = '0x0'; }
+      log(`mint ${amount} for ${account} by ${operator} (hook: ${hook})`);
+      await token.mintForAccount(account, amount, operator);
     }
-    await mintBatch.execute();
+  },
+
+  async assertHookCalled(
+    web3,
+    hook,
+    token,
+    operator,
+    from,
+    to,
+    holderData,
+    operatorData,
+    balance_from,
+    balance_to
+  ) {
+    assert.strictEqual(
+      await hook.methods.token(to).call(),
+      web3.utils.toChecksumAddress(token)
+    );
+    assert.strictEqual(
+      await hook.methods.operator(to).call(),
+      web3.utils.toChecksumAddress(operator)
+    );
+    assert.strictEqual(
+      await hook.methods.from(to).call(),
+      web3.utils.toChecksumAddress(from)
+    );
+    assert.strictEqual(
+      await hook.methods.to(to).call(),
+      web3.utils.toChecksumAddress(to)
+    );
+    assert.strictEqual(await hook.methods.holderData(to).call(), holderData);
+    assert.strictEqual(
+      await hook.methods.operatorData(to).call(), operatorData);
+
+    assert.equal(
+      web3.utils.fromWei(await hook.methods.balanceOf(from).call()),
+      balance_from
+    );
+
+    assert.equal(
+      web3.utils.fromWei(await hook.methods.balanceOf(to).call()),
+      balance_to
+    );
+  },
+
+  async assertHookNotCalled(hook, to) {
+    assert.strictEqual(await hook.methods.token(to).call(), zeroAddress);
+    assert.strictEqual(await hook.methods.operator(to).call(), zeroAddress);
+    assert.strictEqual(await hook.methods.from(to).call(), zeroAddress);
+    assert.strictEqual(await hook.methods.to(to).call(), zeroAddress);
+    assert.strictEqual(await hook.methods.holderData(to).call(), null);
+    assert.strictEqual(await hook.methods.operatorData(to).call(), null);
   },
 };
