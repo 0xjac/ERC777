@@ -11,6 +11,23 @@ exports.test = function(web3, accounts, token) {
       async function() {
         await utils.assertBalance(web3, token, accounts[1], 0);
 
+        let eventsCalled = utils.assertEventsWillBeCalled(
+          token.contract, [{
+            name: 'Minted',
+            data: {
+              operator: web3.utils.toChecksumAddress(accounts[0]),
+              to: web3.utils.toChecksumAddress(accounts[1]),
+              amount: web3.utils.toWei('10'),
+              operatorData: null
+          }}, {
+            name: 'Transfer',
+            data: {
+              from: utils.zeroAddress,
+              to: web3.utils.toChecksumAddress(accounts[1]),
+              amount: web3.utils.toWei('10'),
+          }}]
+        );
+
         await token.contract.methods
           .mint(accounts[1], web3.utils.toWei('10'), '0x')
           .send({ gas: 300000, from: accounts[0] });
@@ -19,6 +36,7 @@ exports.test = function(web3, accounts, token) {
 
         await utils.assertTotalSupply(web3, token, 10);
         await utils.assertBalance(web3, token, accounts[1], 10);
+        await eventsCalled;
       }
     );
 
@@ -26,6 +44,13 @@ exports.test = function(web3, accounts, token) {
       `${utils.formatAccount(accounts[1])} ` +
       '(ERC20 Disabled)', async function() {
       await utils.assertBalance(web3, token, accounts[1], 0);
+
+      let eventCalled = utils.assertEventWillBeCalled(token.contract, 'Minted', {
+        operator: web3.utils.toChecksumAddress(accounts[0]),
+        to: web3.utils.toChecksumAddress(accounts[1]),
+        amount: web3.utils.toWei('10'),
+        operatorData: null
+      });
 
       await token.disableERC20();
 
@@ -35,9 +60,9 @@ exports.test = function(web3, accounts, token) {
 
       await utils.getBlock(web3);
 
-      // TODO check events
       await utils.assertTotalSupply(web3, token, 10);
       await utils.assertBalance(web3, token, accounts[1], 10);
+      await eventCalled;
     });
 
     it(`should not mint -10 ${token.symbol} (negative amount)`,

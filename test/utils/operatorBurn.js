@@ -22,6 +22,24 @@ exports.test = function(web3, accounts, token) {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[1], 10);
 
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'Burned',
+          data: {
+            operator: token.burnOperator,
+            from: accounts[1],
+            amount: web3.utils.toWei('1.12'),
+            holderData: null,
+            operatorData: null,
+        }}, {
+          name: 'Transfer',
+          data: {
+            from: accounts[1],
+            to: utils.zeroAddress,
+            amount: web3.utils.toWei('1.12')
+        }}]
+      );
+
       await token.contract.methods
         .operatorBurn(
           accounts[1], web3.utils.toWei('1.12'), '0x', '0x')
@@ -30,6 +48,42 @@ exports.test = function(web3, accounts, token) {
       await utils.getBlock(web3);
       await utils.assertTotalSupply(web3, token, 10 * accounts.length - 1.12);
       await utils.assertBalance(web3, token, accounts[1], 8.88);
+      await eventsCalled;
+    });
+
+    it(`should let ${utils.formatAccount(token.burnOperator)} ` +
+      `burn 1.12 ${token.symbol} from ` +
+      `${utils.formatAccount(accounts[1])}` +
+      '(ERC20 Disabled)', async function() {
+      await token.contract.methods
+        .authorizeOperator(token.burnOperator)
+        .send({ from: accounts[1], gas: 300000 });
+
+      await token.disableERC20();
+
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[1], 10);
+
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract,
+        'Burned', {
+          operator: token.burnOperator,
+          from: accounts[1],
+          amount: web3.utils.toWei('1.12'),
+          holderData: '0xcafe',
+          operatorData: '0xbeef',
+        }
+      );
+
+      await token.contract.methods
+        .operatorBurn(
+          accounts[1], web3.utils.toWei('1.12'), '0xcafe', '0xbeef')
+        .send({ gas: 300000, from: token.burnOperator });
+
+      await utils.getBlock(web3);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length - 1.12);
+      await utils.assertBalance(web3, token, accounts[1], 8.88);
+      await eventCalled;
     });
 
     it(`should not let ${utils.formatAccount(token.burnOperator)} burn from ` +

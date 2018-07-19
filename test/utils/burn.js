@@ -16,13 +16,32 @@ exports.test = function(web3, accounts, token) {
       async function() {
         await utils.assertBalance(web3, token, accounts[0], 10);
 
+        let eventsCalled = utils.assertEventsWillBeCalled(
+          token.contract, [{
+            name: 'Burned',
+            data: {
+              operator: accounts[0],
+              from: accounts[0],
+              amount: web3.utils.toWei('3'),
+              holderData: '0xbeef',
+              operatorData: null,
+          }}, {
+            name: 'Transfer',
+            data: {
+              from: accounts[0],
+              to: utils.zeroAddress,
+              amount: web3.utils.toWei('3')
+          }}]
+        );
+
         await token.contract.methods
-          .burn(web3.utils.toWei('3'), '0x')
+          .burn(web3.utils.toWei('3'), '0xbeef')
           .send({ gas: 300000, from: accounts[0] });
 
         await utils.getBlock(web3);
         await utils.assertBalance(web3, token, accounts[0], 7);
         await utils.assertTotalSupply(web3, token, 10 * accounts.length - 3);
+        await eventsCalled;
       }
     );
 
@@ -32,8 +51,18 @@ exports.test = function(web3, accounts, token) {
 
       await token.disableERC20();
 
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract,
+        'Burned', {
+          operator: accounts[0],
+          from: accounts[0],
+          amount: web3.utils.toWei('3'),
+          holderData: '0xcafe',
+          operatorData: null,
+      });
+
       await token.contract.methods
-        .burn(web3.utils.toWei('3'), '0x')
+        .burn(web3.utils.toWei('3'), '0xcafe')
         .send({ gas: 300000, from: accounts[0] });
 
       await utils.getBlock(web3);
@@ -41,6 +70,7 @@ exports.test = function(web3, accounts, token) {
       // TODO check events
       await utils.assertBalance(web3, token, accounts[0], 7);
       await utils.assertTotalSupply(web3, token, 10 * accounts.length - 3);
+      await eventCalled;
     });
 
     it(`should not let ${utils.formatAccount(accounts[0])} burn 11 ` +

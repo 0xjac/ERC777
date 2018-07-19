@@ -61,6 +61,25 @@ exports.test = function(web3, accounts, token) {
         .acceptTokens()
         .send({ gas: 300000, from: accounts[4] });
 
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'Sent',
+          data: {
+            operator: accounts[5],
+            from: accounts[5],
+            to: recipient.options.address,
+            amount: web3.utils.toWei('1.22'),
+            holderData: '0xcafe',
+            operatorData: null
+        }}, {
+          name: 'Transfer',
+          data: {
+            from: accounts[5],
+            to: recipient.options.address,
+            amount: web3.utils.toWei('1.22'),
+        }}]
+      );
+
       const send = token.contract.methods
         .send(recipient.options.address, web3.utils.toWei('1.22'), '0xcafe');
 
@@ -84,7 +103,58 @@ exports.test = function(web3, accounts, token) {
       await utils.assertTotalSupply(web3, token, 10 * accounts.length);
       await utils.assertBalance(web3, token, accounts[5], 8.78);
       await utils.assertBalance(web3, token, recipient.options.address, 1.22);
+      await eventsCalled;
     });
+
+    it('should notify the recipient upon receiving tokens ' +
+      '(ERC20 Disabled)', async function() {
+      const recipient = await deployTokensRecipient(true, accounts[4]);
+
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[5], 10);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+
+      await recipient.methods
+        .acceptTokens()
+        .send({ gas: 300000, from: accounts[4] });
+
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract,
+        'Sent', {
+          operator: accounts[5],
+          from: accounts[5],
+          to: recipient.options.address,
+          amount: web3.utils.toWei('1.22'),
+          holderData: '0xcafe',
+          operatorData: null
+      });
+
+      const send = token.contract.methods
+        .send(recipient.options.address, web3.utils.toWei('1.22'), '0xcafe');
+
+      const sendGas = await send.estimateGas();
+      await send.send({ gas: sendGas, from: accounts[5] });
+
+      await utils.getBlock(web3);
+
+      await utils.assertHookCalled(
+        web3,
+        recipient,
+        token.contract.options.address,
+        accounts[5],
+        accounts[5],
+        recipient.options.address,
+        '0xcafe',
+        null,
+        8.78,
+        1.22
+      );
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[5], 8.78);
+      await utils.assertBalance(web3, token, recipient.options.address, 1.22);
+      await eventCalled;
+    });
+
 
     it('should let the recipient reject the tokens', async function() {
       const recipient = await deployTokensRecipient(true, accounts[4]);
@@ -112,7 +182,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it('should call "TokensRecipient" for ' +
-      `${utils.formatAccount(accounts[4])}`, async function() {
+      `${utils.formatAccount(accounts[4])} on send`, async function() {
       const recipient = await deployTokensRecipient(false, accounts[4]);
 
       await erc820Registry.methods
@@ -130,6 +200,84 @@ exports.test = function(web3, accounts, token) {
       await recipient.methods
         .acceptTokens()
         .send({ gas: 300000, from: accounts[4] });
+
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'Sent',
+          data: {
+            operator: accounts[5],
+            from: accounts[5],
+            to: accounts[4],
+            amount: web3.utils.toWei('4.24'),
+            holderData: '0xbeef',
+            operatorData: null
+        }}, {
+          name: 'Transfer',
+          data: {
+            from: accounts[5],
+            to: accounts[4],
+            amount: web3.utils.toWei('4.24'),
+        }}]
+      );
+
+      await token.contract.methods
+        .send(accounts[4], web3.utils.toWei('4.24'), '0xbeef')
+        .send({ gas: 300000, from: accounts[5] });
+
+      await utils.getBlock(web3);
+
+      await utils.assertHookCalled(
+        web3,
+        recipient,
+        token.contract.options.address,
+        accounts[5],
+        accounts[5],
+        accounts[4],
+        '0xbeef',
+        null,
+        5.76,
+        14.24,
+      );
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[4], 14.24);
+      await utils.assertBalance(web3, token, accounts[5], 5.76);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+      await eventsCalled;
+    });
+
+    it('should call "TokensRecipient" for ' +
+      `${utils.formatAccount(accounts[4])} on send` +
+      '(ERC20 Disabled)', async function() {
+      const recipient = await deployTokensRecipient(false, accounts[4]);
+
+      await erc820Registry.methods
+        .setInterfaceImplementer(
+          accounts[4],
+          web3.utils.keccak256('ERC777TokensRecipient'),
+          recipient.options.address
+        ).send({ from: accounts[4] });
+
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[4], 10);
+      await utils.assertBalance(web3, token, accounts[5], 10);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+
+      await recipient.methods
+        .acceptTokens()
+        .send({ gas: 300000, from: accounts[4] });
+
+      await token.disableERC20();
+
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract,
+        'Sent', {
+          operator: accounts[5],
+          from: accounts[5],
+          to: accounts[4],
+          amount: web3.utils.toWei('1.22'),
+          holderData: '0xbeef',
+          operatorData: null
+      });
 
       await token.contract.methods
         .send(accounts[4], web3.utils.toWei('1.22'), '0xbeef')
@@ -153,6 +301,7 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, accounts[4], 11.22);
       await utils.assertBalance(web3, token, accounts[5], 8.78);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
+      await eventCalled;
     });
 
     it('should not send tokens to a contract ' +
@@ -177,6 +326,65 @@ exports.test = function(web3, accounts, token) {
       await utils.assertBalance(web3, token, recipient.options.address, 0);
     });
 
-    it.skip('should implement more tests for "TokensRecipient"');
+    it('should call "TokensRecipient" for ' +
+      `${utils.formatAccount(accounts[4])} on mint`, async function() {
+      const recipient = await deployTokensRecipient(false, accounts[4]);
+
+      await erc820Registry.methods
+        .setInterfaceImplementer(
+          accounts[4],
+          web3.utils.keccak256('ERC777TokensRecipient'),
+          recipient.options.address
+        ).send({ from: accounts[4] });
+
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertBalance(web3, token, accounts[4], 10);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+
+      await recipient.methods
+        .acceptTokens()
+        .send({ gas: 300000, from: accounts[4] });
+
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'Minted',
+          data: {
+            operator: accounts[0],
+            to: accounts[4],
+            amount: web3.utils.toWei('1.22'),
+            operatorData: '0xbeef'
+        }}, {
+          name: 'Transfer',
+          data: {
+            from: utils.zeroAddress,
+            to: accounts[4],
+            amount: web3.utils.toWei('1.22'),
+        }}]
+      );
+
+      await token.contract.methods
+        .mint(accounts[4], web3.utils.toWei('1.22'), '0xbeef')
+        .send({ gas: 300000, from: accounts[0] });
+
+      await utils.getBlock(web3);
+
+      await utils.assertHookCalled(
+        web3,
+        recipient,
+        token.contract.options.address,
+        accounts[0],
+        utils.zeroAddress,
+        accounts[4],
+        null,
+        '0xbeef',
+        0,
+        11.22,
+      );
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + 1.22);
+      await utils.assertBalance(web3, token, accounts[4], 11.22);
+      await utils.assertBalance(web3, token, recipient.options.address, 0);
+      await eventsCalled;
+    });
+
   });
 };

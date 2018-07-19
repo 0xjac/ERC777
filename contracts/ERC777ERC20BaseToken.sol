@@ -67,7 +67,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     /// @return `true`, if the approve can't be done, it should fail.
     function approve(address _spender, uint256 _amount) public erc20 returns (bool success) {
         mAllowed[msg.sender][_spender] = _amount;
-        Approval(msg.sender, _spender, _amount);
+        emit Approval(msg.sender, _spender, _amount);
         return true;
     }
 

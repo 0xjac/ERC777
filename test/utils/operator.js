@@ -46,6 +46,12 @@ exports.test = function(web3, accounts, token) {
           .call()
       );
 
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract, 'RevokedOperator', {
+          operator: web3.utils.toChecksumAddress(token.defaultOperators[1]),
+          tokenHolder: accounts[3],
+      });
+
       await token.contract.methods
         .revokeOperator(token.defaultOperators[1])
         .send({ from: accounts[3], gas: 300000 });
@@ -56,6 +62,7 @@ exports.test = function(web3, accounts, token) {
           .isOperatorFor(token.defaultOperators[1], accounts[3])
           .call()
       );
+      await eventCalled;
     });
 
     it(`should let ${utils.formatAccount(accounts[4])} reauthorize the ` +
@@ -66,6 +73,20 @@ exports.test = function(web3, accounts, token) {
         await token.contract.methods
           .isOperatorFor(token.defaultOperators[0], accounts[4])
           .call()
+      );
+
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'RevokedOperator',
+          data: {
+            operator: web3.utils.toChecksumAddress(token.defaultOperators[0]),
+            tokenHolder: accounts[4],
+        }}, {
+          name: 'AuthorizedOperator',
+          data: {
+            operator: web3.utils.toChecksumAddress(token.defaultOperators[0]),
+            tokenHolder: accounts[4],
+        }}]
       );
 
       await token.contract.methods
@@ -89,6 +110,7 @@ exports.test = function(web3, accounts, token) {
           .isOperatorFor(token.defaultOperators[0], accounts[4])
           .call()
       );
+      await eventsCalled;
     });
 
     it(`should detect ${utils.formatAccount(accounts[3])} is not an operator ` +
@@ -102,6 +124,13 @@ exports.test = function(web3, accounts, token) {
 
     it(`should authorize ${utils.formatAccount(accounts[3])} as an operator ` +
       `for ${utils.formatAccount(accounts[1])}`, async function() {
+
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract, 'AuthorizedOperator', {
+          operator: accounts[3],
+          tokenHolder: accounts[1],
+      });
+
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
@@ -111,10 +140,21 @@ exports.test = function(web3, accounts, token) {
           .isOperatorFor(accounts[3], accounts[1])
           .call()
       );
+      await eventCalled;
     });
 
     it(`should revoke ${utils.formatAccount(accounts[3])} as an operator for ` +
       `${utils.formatAccount(accounts[1])}`, async function() {
+      let eventsCalled = utils.assertEventsWillBeCalled(
+        token.contract, [{
+          name: 'AuthorizedOperator',
+          data: { operator: accounts[3], tokenHolder: accounts[1] },
+        }, {
+          name: 'RevokedOperator',
+          data: { operator: accounts[3], tokenHolder: accounts[1] },
+        }]
+      );
+
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
@@ -135,6 +175,7 @@ exports.test = function(web3, accounts, token) {
           .isOperatorFor(accounts[3], accounts[1])
           .call()
       );
+      await eventsCalled;
     });
 
     it(`should not let ${utils.formatAccount(accounts[3])} authorize itself ` +

@@ -22,9 +22,26 @@ let blockIdx = 0;
 const log = (msg) => process.env.MOCHA_VERBOSE && console.log(msg);
 const zeroAddress = '0x0000000000000000000000000000000000000000';
 
+function assertEventWillBeCalled(contract, name, data) {
+  return new Promise((resolve, reject) => {
+    contract.once(name, function(err, event){
+      if (err) { reject(err); }
+      log(`${name} called with ${JSON.stringify(event.returnValues)}`);
+      assert.deepOwnInclude(
+        event.returnValues, data, `Event: ${name}: invalid data`);
+      resolve();
+    });
+  });
+}
+
 module.exports = {
   zeroAddress,
   log,
+  assertEventWillBeCalled,
+  assertEventsWillBeCalled(contract, events) {
+    return Promise.all(events
+      .map(event => assertEventWillBeCalled(contract, event.name, event.data)));
+  },
 
   formatAccount(account) {
     if (testAccounts.includes(account)) { return `${account.slice(0, 4)}...`; }
