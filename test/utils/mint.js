@@ -34,7 +34,7 @@ exports.test = function(web3, accounts, token) {
 
         await utils.getBlock(web3);
 
-        await utils.assertTotalSupply(web3, token, 10);
+        await utils.assertTotalSupply(web3, token, token.initialSupply + 10);
         await utils.assertBalance(web3, token, accounts[1], 10);
         await eventsCalled;
       }
@@ -60,7 +60,7 @@ exports.test = function(web3, accounts, token) {
 
       await utils.getBlock(web3);
 
-      await utils.assertTotalSupply(web3, token, 10);
+      await utils.assertTotalSupply(web3, token, token.initialSupply + 10);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await eventCalled;
     });
@@ -76,7 +76,7 @@ exports.test = function(web3, accounts, token) {
 
         await utils.getBlock(web3);
 
-        await utils.assertTotalSupply(web3, token, 0);
+        await utils.assertTotalSupply(web3, token, token.initialSupply);
         await utils.assertBalance(web3, token, accounts[1], 0);
       }
     );
@@ -92,7 +92,7 @@ exports.test = function(web3, accounts, token) {
 
         await utils.getBlock(web3);
         await utils.assertBalance(web3, token, accounts[1], 0);
-        await utils.assertTotalSupply(web3, token, 0);
+        await utils.assertTotalSupply(web3, token, token.initialSupply);
       }
     );
   });

@@ -23,7 +23,7 @@ contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface
     mapping(address => address) public from;
     mapping(address => address) public to;
     mapping(address => uint256) public amount;
-    mapping(address => bytes) public holderData;
+    mapping(address => bytes) public data;
     mapping(address => bytes) public operatorData;
     mapping(address => uint256) public balanceOf;
 
@@ -33,13 +33,13 @@ contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface
     }
 
     function tokensReceived(
-        address operator,  // solhint-disable no-unused-vars
-        address from,
-        address to,
-        uint amount,
-        bytes holderData,
-        bytes operatorData
-    )  // solhint-enable no-unused-vars
+        address _operator,
+        address _from,
+        address _to,
+        uint256 _amount,
+        bytes _data,
+        bytes _operatorData
+    )
         public
     {
         require(allowTokensReceived, "Receive not allowed");
@@ -48,7 +48,7 @@ contract ExampleTokensRecipient is ERC820Implementer, ERC820ImplementerInterface
         from[_to] = _from;
         to[_to] = _to;
         amount[_to] = _amount;
-        holderData[_to] = _holderData;
+        data[_to] = _data;
         operatorData[_to] = _operatorData;
         balanceOf[_from] = ERC777Token(msg.sender).balanceOf(_from);
         balanceOf[_to] = ERC777Token(msg.sender).balanceOf(_to);

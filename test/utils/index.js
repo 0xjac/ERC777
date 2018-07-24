@@ -97,7 +97,7 @@ module.exports = {
     operator,
     from,
     to,
-    holderData,
+    data,
     operatorData,
     balance_from,
     balance_to
@@ -118,7 +118,7 @@ module.exports = {
       await hook.methods.to(to).call(),
       web3.utils.toChecksumAddress(to)
     );
-    assert.strictEqual(await hook.methods.holderData(to).call(), holderData);
+    assert.strictEqual(await hook.methods.data(to).call(), data);
     assert.strictEqual(
       await hook.methods.operatorData(to).call(), operatorData);
 
@@ -138,7 +138,7 @@ module.exports = {
     assert.strictEqual(await hook.methods.operator(to).call(), zeroAddress);
     assert.strictEqual(await hook.methods.from(to).call(), zeroAddress);
     assert.strictEqual(await hook.methods.to(to).call(), zeroAddress);
-    assert.strictEqual(await hook.methods.holderData(to).call(), null);
+    assert.strictEqual(await hook.methods.data(to).call(), null);
     assert.strictEqual(await hook.methods.operatorData(to).call(), null);
   },
 };

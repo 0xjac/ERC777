@@ -53,7 +53,7 @@ exports.test = function(web3, accounts, token) {
     it('should notify the recipient upon receiving tokens', async function() {
       const recipient = await deployTokensRecipient(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
 
@@ -69,7 +69,7 @@ exports.test = function(web3, accounts, token) {
             from: accounts[5],
             to: recipient.options.address,
             amount: web3.utils.toWei('1.22'),
-            holderData: '0xcafe',
+            data: '0xcafe',
             operatorData: null
         }}, {
           name: 'Transfer',
@@ -100,7 +100,7 @@ exports.test = function(web3, accounts, token) {
         8.78,
         1.22
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 8.78);
       await utils.assertBalance(web3, token, recipient.options.address, 1.22);
       await eventsCalled;
@@ -110,7 +110,7 @@ exports.test = function(web3, accounts, token) {
       '(ERC20 Disabled)', async function() {
       const recipient = await deployTokensRecipient(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
 
@@ -125,7 +125,7 @@ exports.test = function(web3, accounts, token) {
           from: accounts[5],
           to: recipient.options.address,
           amount: web3.utils.toWei('1.22'),
-          holderData: '0xcafe',
+          data: '0xcafe',
           operatorData: null
       });
 
@@ -149,7 +149,7 @@ exports.test = function(web3, accounts, token) {
         8.78,
         1.22
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 8.78);
       await utils.assertBalance(web3, token, recipient.options.address, 1.22);
       await eventCalled;
@@ -159,7 +159,7 @@ exports.test = function(web3, accounts, token) {
     it('should let the recipient reject the tokens', async function() {
       const recipient = await deployTokensRecipient(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
 
@@ -176,7 +176,7 @@ exports.test = function(web3, accounts, token) {
 
       // revert will revert setting data in the hook
       utils.assertHookNotCalled(recipient, recipient.options.address);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
     });
@@ -192,7 +192,7 @@ exports.test = function(web3, accounts, token) {
           recipient.options.address
         ).send({ from: accounts[4] });
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
@@ -209,7 +209,7 @@ exports.test = function(web3, accounts, token) {
             from: accounts[5],
             to: accounts[4],
             amount: web3.utils.toWei('4.24'),
-            holderData: '0xbeef',
+            data: '0xbeef',
             operatorData: null
         }}, {
           name: 'Transfer',
@@ -238,7 +238,7 @@ exports.test = function(web3, accounts, token) {
         5.76,
         14.24,
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 14.24);
       await utils.assertBalance(web3, token, accounts[5], 5.76);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
@@ -257,7 +257,7 @@ exports.test = function(web3, accounts, token) {
           recipient.options.address
         ).send({ from: accounts[4] });
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
@@ -275,7 +275,7 @@ exports.test = function(web3, accounts, token) {
           from: accounts[5],
           to: accounts[4],
           amount: web3.utils.toWei('1.22'),
-          holderData: '0xbeef',
+          data: '0xbeef',
           operatorData: null
       });
 
@@ -297,7 +297,7 @@ exports.test = function(web3, accounts, token) {
         8.78,
         11.22,
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 11.22);
       await utils.assertBalance(web3, token, accounts[5], 8.78);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
@@ -308,7 +308,7 @@ exports.test = function(web3, accounts, token) {
       'without TokensRecipient', async function() {
       const recipient = await deployTokensRecipient(false, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
 
@@ -321,7 +321,7 @@ exports.test = function(web3, accounts, token) {
 
       // revert will revert setting data in the hook
       utils.assertHookNotCalled(recipient, recipient.options.address);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
     });
@@ -337,7 +337,7 @@ exports.test = function(web3, accounts, token) {
           recipient.options.address
         ).send({ from: accounts[4] });
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
 
@@ -380,7 +380,7 @@ exports.test = function(web3, accounts, token) {
         0,
         11.22,
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + 1.22);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply + 1.22);
       await utils.assertBalance(web3, token, accounts[4], 11.22);
       await utils.assertBalance(web3, token, recipient.options.address, 0);
       await eventsCalled;

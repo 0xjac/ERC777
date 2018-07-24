@@ -23,7 +23,7 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
     mapping(address => address) public from;
     mapping(address => address) public to;
     mapping(address => uint256) public amount;
-    mapping(address => bytes) public holderData;
+    mapping(address => bytes) public data;
     mapping(address => bytes) public operatorData;
     mapping(address => uint256) public balanceOf;
 
@@ -37,7 +37,7 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
         address _from,
         address _to,
         uint _amount,
-        bytes _holderData,
+        bytes _data,
         bytes _operatorData
     )
         public
@@ -48,7 +48,7 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
         from[_to] = _from;
         to[_to] = _to;
         amount[_to] = _amount;
-        holderData[_to] = _holderData;
+        data[_to] = _data;
         operatorData[_to] = _operatorData;
         balanceOf[_from] = ERC777Token(msg.sender).balanceOf(_from);
         balanceOf[_to] = ERC777Token(msg.sender).balanceOf(_to);

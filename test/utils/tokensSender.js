@@ -60,7 +60,7 @@ exports.test = function(web3, accounts, token) {
     it('should notify the token holder before sending tokens', async function() {
       const sender = await deployTokensSender(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -78,7 +78,7 @@ exports.test = function(web3, accounts, token) {
             from: accounts[4],
             to: accounts[5],
             amount: web3.utils.toWei('1.22'),
-            holderData: null,
+            data: null,
             operatorData: null
         }}, {
           name: 'Transfer',
@@ -107,7 +107,7 @@ exports.test = function(web3, accounts, token) {
         10,
         10
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 8.78);
       await utils.assertBalance(web3, token, accounts[5], 11.22);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -118,7 +118,7 @@ exports.test = function(web3, accounts, token) {
       '(ERC20 Disabled)', async function() {
       const sender = await deployTokensSender(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -137,7 +137,7 @@ exports.test = function(web3, accounts, token) {
           from: accounts[4],
           to: accounts[5],
           amount: web3.utils.toWei('1.22'),
-          holderData: null,
+          data: null,
           operatorData: null
       });
 
@@ -159,7 +159,7 @@ exports.test = function(web3, accounts, token) {
         10,
         10
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 8.78);
       await utils.assertBalance(web3, token, accounts[5], 11.22);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -169,7 +169,7 @@ exports.test = function(web3, accounts, token) {
     it('should block the sending of tokens for the token holder', async function() {
       const sender = await deployTokensSender(true, accounts[4]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -187,7 +187,7 @@ exports.test = function(web3, accounts, token) {
 
       // revert will revert setting data in the hook
       utils.assertHookNotCalled(sender, sender.options.address);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[4], 10);
       await utils.assertBalance(web3, token, accounts[5], 10);
       await utils.assertBalance(web3, token, sender.options.address, 0);
@@ -196,8 +196,8 @@ exports.test = function(web3, accounts, token) {
     it('should notify the token holder before burning tokens', async function() {
       const sender = await deployTokensSender(true, accounts[0]);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
-      await utils.assertBalance(web3, token, accounts[0], 10);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertBalance(web3, token, accounts[0], token.initialSupply + 10);
       await utils.assertBalance(web3, token, sender.options.address, 0);
       utils.assertHookNotCalled(sender, sender.options.address);
 
@@ -212,7 +212,7 @@ exports.test = function(web3, accounts, token) {
             operator: accounts[0],
             from: accounts[0],
             amount: web3.utils.toWei('1.22'),
-            holderData: null,
+            data: null,
             operatorData: null
         }}, {
           name: 'Transfer',
@@ -238,11 +238,11 @@ exports.test = function(web3, accounts, token) {
         utils.zeroAddress,
         null,
         null,
-        10,
+        token.initialSupply + 10,
         0
       );
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length - 1.22);
-      await utils.assertBalance(web3, token, accounts[0], 8.78);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply - 1.22);
+      await utils.assertBalance(web3, token, accounts[0], token.initialSupply + 8.78);
       await utils.assertBalance(web3, token, sender.options.address, 0);
       await eventsCalled;
     });

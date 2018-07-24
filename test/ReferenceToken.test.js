@@ -28,8 +28,8 @@ contract('ReferenceToken', function(accounts) {
     granularity: '0.01',
     defaultOperators: [accounts[6], accounts[7]],
     burnOperator: accounts[8],
-    totalSupply: '0',
-    defaultBalance: '0',
+    defaultBalance: 0,
+    initialSupply: 10,
   };
 
   const deployContract = ReferenceToken
@@ -39,6 +39,7 @@ contract('ReferenceToken', function(accounts) {
       web3.utils.toWei(token.granularity),
       token.defaultOperators,
       token.burnOperator,
+      web3.utils.toWei(token.initialSupply.toString()),
     ] });
 
   beforeEach(async function() {
@@ -77,6 +78,7 @@ contract('ReferenceToken', function(accounts) {
           web3.utils.toWei('0'),
           token.defaultOperators,
           token.burnOperator,
+          web3.utils.toWei(token.initialSupply.toString()),
         ] })
         .send({ from: accounts[0], gasLimit: estimateGas })
         .should.be.rejectedWith('revert');

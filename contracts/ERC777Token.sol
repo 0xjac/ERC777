@@ -21,22 +21,22 @@ interface ERC777Token {
     function authorizeOperator(address operator) public;
     function revokeOperator(address operator) public;
 
-    function send(address to, uint256 amount, bytes holderData) public;
-    function operatorSend(address from, address to, uint256 amount, bytes holderData, bytes operatorData) public;
+    function send(address to, uint256 amount, bytes data) public;
+    function operatorSend(address from, address to, uint256 amount, bytes data, bytes operatorData) public;
 
-    function burn(uint256 amount, bytes holderData) public;
-    function operatorBurn(address from, uint256 amount, bytes holderData, bytes operatorData) public;
+    function burn(uint256 amount, bytes data) public;
+    function operatorBurn(address from, uint256 amount, bytes data, bytes operatorData) public;
 
     event Sent(
         address indexed operator,
         address indexed from,
         address indexed to,
         uint256 amount,
-        bytes holderData,
+        bytes data,
         bytes operatorData
     ); // solhint-disable-next-line separate-by-one-line-in-contract
     event Minted(address indexed operator, address indexed to, uint256 amount, bytes operatorData);
-    event Burned(address indexed operator, address indexed from, uint256 amount, bytes holderData, bytes operatorData);
+    event Burned(address indexed operator, address indexed from, uint256 amount, bytes data, bytes operatorData);
     event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
     event RevokedOperator(address indexed operator, address indexed tokenHolder);
 }

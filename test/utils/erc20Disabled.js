@@ -24,7 +24,7 @@ exports.test = function(web3, accounts, token) {
     it(`should not let ${utils.formatAccount(accounts[2])} ` +
       `transfer 3 ${token.symbol} ` +
       `to ${utils.formatAccount(accounts[1])}`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -34,7 +34,7 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
@@ -55,7 +55,7 @@ exports.test = function(web3, accounts, token) {
     it(`should not let ${utils.formatAccount(accounts[3])} ` +
       `transfer 1 ${token.symbol} ` +
       `from ${utils.formatAccount(accounts[1])}`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -70,7 +70,7 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length);
+      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });

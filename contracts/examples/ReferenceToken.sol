@@ -28,10 +28,14 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         string _symbol,
         uint256 _granularity,
         address[] _defaultOperators,
-        address _burnOperator
+        address _burnOperator,
+        uint256 _initialSupply
     )
         public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators)
-    { mBurnOperator = _burnOperator; }
+    {
+        mBurnOperator = _burnOperator;
+        doMint(msg.sender, _initialSupply, "");
+    }
 
     /// @notice Disables the ERC20 interface. This function can only be called
     ///  by the owner.
@@ -57,14 +61,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     /// @param _amount The quantity of tokens generated
     /// @param _operatorData Data that will be passed to the recipient as a first transfer
     function mint(address _tokenHolder, uint256 _amount, bytes _operatorData) public onlyOwner {
-        requireMultiple(_amount);
-        mTotalSupply = mTotalSupply.add(_amount);
-        mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_amount);
-
-        callRecipient(msg.sender, 0x0, _tokenHolder, _amount, "", _operatorData, true);
-
-        emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
-        if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
+        doMint(_tokenHolder, _amount, _operatorData);
     }
 
     /// @notice Burns `_amount` tokens from `msg.sender`
@@ -72,8 +69,8 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     ///  Do not forget to override the `burn` function in your token contract if you want to prevent users from
     ///  burning their tokens.
     /// @param _amount The quantity of tokens to burn
-    function burn(uint256 _amount, bytes _holderData) public onlyOwner {
-        super.burn(_amount, _holderData);
+    function burn(uint256 _amount, bytes _data) public onlyOwner {
+        super.burn(_amount, _data);
     }
 
     /// @notice Burns `_amount` tokens from `_tokenHolder` by `_operator`
@@ -82,8 +79,19 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     ///  burning their tokens.
     /// @param _tokenHolder The address that will lose the tokens
     /// @param _amount The quantity of tokens to burn
-    function operatorBurn(address _tokenHolder, uint256 _amount, bytes _holderData, bytes _operatorData) public {
+    function operatorBurn(address _tokenHolder, uint256 _amount, bytes _data, bytes _operatorData) public {
         require(msg.sender == mBurnOperator, "Not a burn operator");
-        super.operatorBurn(_tokenHolder, _amount, _holderData, _operatorData);
+        super.operatorBurn(_tokenHolder, _amount, _data, _operatorData);
+    }
+
+    function doMint(address _tokenHolder, uint256 _amount, bytes _operatorData) private {
+        requireMultiple(_amount);
+        mTotalSupply = mTotalSupply.add(_amount);
+        mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_amount);
+
+        callRecipient(msg.sender, 0x0, _tokenHolder, _amount, "", _operatorData, true);
+
+        emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
+        if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
     }
 }
