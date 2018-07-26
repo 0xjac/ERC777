@@ -41,9 +41,9 @@ npm install erc777
 
 ## Logo
 
-> The logo MUST NOT be used to advertise, promote or associate in any way technology &ndash; such as tokens &ndash; which is not ERC777 compliant.
+> The logo MUST NOT be used to advertise, promote or associate in any way technology &ndash; such as tokens &ndash; which are not ERC777 compliant.
 
-The officila logo for the standard can be found in the official EIPs repository at: [/ethereum/EIPs/assets/eip-777/logo](https://github.com/ethereum/EIPs/tree/master/assets/eip-777/logo).  
+The official logo for the standard can be found in the official EIPs repository at: [/ethereum/EIPs/assets/eip-777/logo](https://github.com/ethereum/EIPs/tree/master/assets/eip-777/logo).  
 Copies of the logo are provided here as well as a courtesy and can be found in the [logo](./logo) folder in [svg](logo/svg) and [png](logo/png) formats.
 
 Variations exist in 5 colors as follow:
