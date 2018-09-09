@@ -34,7 +34,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     }
 
     /// @notice For Backwards compatibility
-    /// @return The decimls of the token. Forced to 18 in ERC777.
+    /// @return The decimals of the token. Forced to 18 in ERC777.
     function decimals() public erc20 view returns (uint8) { return uint8(18); }
 
     /// @notice ERC20 backwards compatible transfer.
