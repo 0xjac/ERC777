@@ -193,13 +193,14 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     function doBurn(address _operator, address _tokenHolder, uint256 _amount, bytes _data, bytes _operatorData)
         internal
     {
+        callSender(_operator, _tokenHolder, 0x0, _amount, _data, _operatorData);
+
         requireMultiple(_amount);
         require(balanceOf(_tokenHolder) >= _amount, "Not enough funds");
 
         mBalances[_tokenHolder] = mBalances[_tokenHolder].sub(_amount);
         mTotalSupply = mTotalSupply.sub(_amount);
 
-        callSender(_operator, _tokenHolder, 0x0, _amount, _data, _operatorData);
         emit Burned(_operator, _tokenHolder, _amount, _data, _operatorData);
     }
 
