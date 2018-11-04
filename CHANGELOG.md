@@ -9,13 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Broaden the Solidity version pragma to ^0.4.21
-- Set cache of shield.io badges to 1h
-- Use master/devel branch instead of master
-- Cleanup CONTRIBUTING.md
-- Make the reference implementation use the base token
-
 ### Added
 - [README]: EIP badge with link to the official EIP
 - Coverage information with minimum threshold of 95%
@@ -24,10 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Contract deployment in test using web3.js 1.0.0
 - More tests
 - Add Base Token (pure ERC77 and ERC20 compat.) to let others easily implement their token.
+- ERC20 toggle events
 
 ### Changed
 - Fix typos in [README]
 - Use cleaner imports in Solidity
+- Code cleanup
+- Broaden the Solidity version pragma to ^0.4.24
+- Set cache of shield.io badges to 1h
+- Use master/devel branch instead of master
+- Cleanup CONTRIBUTING.md
+- Make the reference implementation use the base token
+- Turffle as a dev dependency
 
 ## [0.1.1] - 2018-05-07
 
