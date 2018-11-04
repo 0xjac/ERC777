@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Soliditiy linting with Solium
 
 ### Changed
-- Fix typos in [README]
 - Use cleaner imports in Solidity
 - Code cleanup
 - Broaden the Solidity version pragma to ^0.4.24
@@ -29,10 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use master/devel branch instead of master
 - Cleanup CONTRIBUTING.md
 - Make the reference implementation use the base token
-- Turffle as a dev dependency
+- Truffle as a dev dependency
 
 ### Removed
 - Solhint
+
+### Fixed
+- Typos in [README]
 
 ## [0.1.1] - 2018-05-07
 
@@ -51,8 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `truffle` instead of `solcpiler`
 - Use `openzeppelin-solidity` instead of `giveth-common-contracts`
 - Use CircleCI instead of Travis
-- Fix version badge in [README]
-- Fix links in [README]
+
+### Fixed
+- Version badge in [README]
+- Links in [README]
 
 ## [0.1.0] - 2018-03-15
 
