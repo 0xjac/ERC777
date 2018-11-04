@@ -15,7 +15,7 @@
     "test": "test"
   },
   "scripts": {
-    "lint:sol": "npx solhint --formatter ../../../eslint-formatter-stylish-verbose 'contracts/**/*.sol'",
+    "lint:sol": "npx solium --reporter pretty --dir contracts",
     "lint:js": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
     "lint": "npm run lint:sol && npm run lint:js",
     "build:sol": "npx truffle compile",
@@ -72,8 +72,8 @@
     "ganache-cli": "6.1.0",
     "mocha": "^4.1.0",
     "sha3": "^1.2.1",
-    "solhint": "^1.2.1",
     "solidity-coverage": "^0.5.5",
+    "solium": "^1.1.8",
     "truffle": "4.1.13",
     "web3": "1.0.0-beta.34"
   }

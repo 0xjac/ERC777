@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More tests
 - Add Base Token (pure ERC77 and ERC20 compat.) to let others easily implement their token.
 - ERC20 toggle events
+- Soliditiy linting with Solium
 
 ### Changed
 - Fix typos in [README]
@@ -29,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleanup CONTRIBUTING.md
 - Make the reference implementation use the base token
 - Turffle as a dev dependency
+
+### Removed
+- Solhint
 
 ## [0.1.1] - 2018-05-07
 
