@@ -19,7 +19,8 @@ exports.test = function(web3, accounts, token) {
         .authorizeOperator(token.burnOperator)
         .send({ from: accounts[1], gas: 300000 });
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
 
       let eventsCalled = utils.assertEventsWillBeCalled(
@@ -31,13 +32,15 @@ exports.test = function(web3, accounts, token) {
             amount: web3.utils.toWei('1.12'),
             data: null,
             operatorData: null,
-        }}, {
+          },
+        }, {
           name: 'Transfer',
           data: {
             from: accounts[1],
             to: utils.zeroAddress,
-            amount: web3.utils.toWei('1.12')
-        }}]
+            amount: web3.utils.toWei('1.12'),
+          },
+        }]
       );
 
       await token.contract.methods
@@ -46,7 +49,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: token.burnOperator });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply - 1.12);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply - 1.12);
       await utils.assertBalance(web3, token, accounts[1], 8.88);
       await eventsCalled;
     });
@@ -61,7 +65,8 @@ exports.test = function(web3, accounts, token) {
 
       await token.disableERC20();
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
 
       let eventCalled = utils.assertEventWillBeCalled(
@@ -81,14 +86,16 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: token.burnOperator });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply - 1.12);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply - 1.12);
       await utils.assertBalance(web3, token, accounts[1], 8.88);
       await eventCalled;
     });
 
     it(`should not let ${utils.formatAccount(token.burnOperator)} burn from ` +
       `${utils.formatAccount(accounts[2])} (not operator)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
@@ -98,14 +105,16 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should not let ${utils.formatAccount(accounts[4])} burn from ` +
       `${utils.formatAccount(accounts[2])} ` +
       '(not burn operator)', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
       await token.contract.methods
@@ -119,13 +128,15 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should let ${utils.formatAccount(token.burnOperator)} ` +
       'use operatorBurn on itself', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, token.burnOperator, 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -135,7 +146,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: token.burnOperator });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply - 3.72);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply - 3.72);
       await utils.assertBalance(web3, token, token.burnOperator, 6.28);
     });
   });

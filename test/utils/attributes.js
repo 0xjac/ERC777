@@ -40,7 +40,7 @@ exports.test = function(web3, accounts, token) {
     it(`should have a balance of ${token.defaultBalance} for all accounts`,
       async function() {
         for (let acc in balances) {
-          let balance = acc == accounts[0]
+          let balance = acc === accounts[0]
             ? token.initialSupply + balances[acc]
             : balances[acc];
           await utils.assertBalance(web3, token, acc, balance);

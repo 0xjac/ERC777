@@ -50,7 +50,8 @@ exports.test = function(web3, accounts, token) {
         token.contract, 'RevokedOperator', {
           operator: web3.utils.toChecksumAddress(token.defaultOperators[1]),
           tokenHolder: accounts[3],
-      });
+        }
+      );
 
       await token.contract.methods
         .revokeOperator(token.defaultOperators[1])
@@ -81,12 +82,14 @@ exports.test = function(web3, accounts, token) {
           data: {
             operator: web3.utils.toChecksumAddress(token.defaultOperators[0]),
             tokenHolder: accounts[4],
-        }}, {
+          },
+        }, {
           name: 'AuthorizedOperator',
           data: {
             operator: web3.utils.toChecksumAddress(token.defaultOperators[0]),
             tokenHolder: accounts[4],
-        }}]
+          },
+        }]
       );
 
       await token.contract.methods
@@ -124,12 +127,10 @@ exports.test = function(web3, accounts, token) {
 
     it(`should authorize ${utils.formatAccount(accounts[3])} as an operator ` +
       `for ${utils.formatAccount(accounts[1])}`, async function() {
-
       let eventCalled = utils.assertEventWillBeCalled(
-        token.contract, 'AuthorizedOperator', {
-          operator: accounts[3],
-          tokenHolder: accounts[1],
-      });
+        token.contract, 'AuthorizedOperator',
+        { operator: accounts[3], tokenHolder: accounts[1] }
+      );
 
       await token.contract.methods
         .authorizeOperator(accounts[3])
@@ -180,7 +181,8 @@ exports.test = function(web3, accounts, token) {
 
     it(`should not let ${utils.formatAccount(accounts[3])} authorize itself ` +
       'as one of his own operators', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
 
       await token.contract.methods
@@ -189,7 +191,8 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
     });
 
@@ -204,7 +207,8 @@ exports.test = function(web3, accounts, token) {
 
     it(`should not let ${utils.formatAccount(accounts[3])} revoke itself ` +
       'as one of its own operators', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
 
       await token.contract.methods
@@ -213,7 +217,8 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
     });
   });

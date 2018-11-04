@@ -14,7 +14,7 @@ const testAccounts = [
   '0x6b09D6433a379752157fD1a9E537c5CAe5fa3168',
   '0x7dc0a40D64d72bb4590652B8f5C687bF7F26400c',
   '0x8dF64de79608F0aE9e72ECAe3A400582AeD8101C',
-  '0x9a5279029e9A2D6E787c5A09CB068AB3D45e209d'
+  '0x9a5279029e9A2D6E787c5A09CB068AB3D45e209d',
 ];
 const blocks = [];
 let blockIdx = 0;
@@ -24,7 +24,7 @@ const zeroAddress = '0x0000000000000000000000000000000000000000';
 
 function assertEventWillBeCalled(contract, name, data) {
   return new Promise((resolve, reject) => {
-    contract.once(name, function(err, event){
+    contract.once(name, function(err, event) {
       if (err) { reject(err); }
       log(`${name} called with ${JSON.stringify(event.returnValues)}`);
       assert.deepOwnInclude(
@@ -99,8 +99,8 @@ module.exports = {
     to,
     data,
     operatorData,
-    balance_from,
-    balance_to
+    balanceFrom,
+    balanceTo,
   ) {
     assert.strictEqual(
       await hook.methods.token(to).call(),
@@ -124,12 +124,12 @@ module.exports = {
 
     assert.equal(
       web3.utils.fromWei(await hook.methods.balanceOf(from).call()),
-      balance_from
+      balanceFrom
     );
 
     assert.equal(
       web3.utils.fromWei(await hook.methods.balanceOf(to).call()),
-      balance_to
+      balanceTo
     );
   },
 

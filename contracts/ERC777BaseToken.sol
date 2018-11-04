@@ -104,7 +104,7 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @param _tokenHolder address which holds the tokens to be managed
     /// @return `true` if `_operator` is authorized for `_tokenHolder`
     function isOperatorFor(address _operator, address _tokenHolder) public view returns (bool) {
-        return (_operator == _tokenHolder
+        return (_operator == _tokenHolder // solium-disable-line operator-whitespace
             || mAuthorizedOperators[_operator][_tokenHolder]
             || (mIsDefaultOperator[_operator] && !mRevokedDefaultOperator[_operator][_tokenHolder]));
     }
@@ -125,7 +125,7 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     }
 
     function operatorBurn(address _tokenHolder, uint256 _amount, bytes _data, bytes _operatorData) public {
-        require(isOperatorFor(msg.sender, _tokenHolder));
+        require(isOperatorFor(msg.sender, _tokenHolder), "Not an operator");
         doBurn(msg.sender, _tokenHolder, _amount, _data, _operatorData);
     }
 

@@ -15,7 +15,8 @@ exports.test = function(web3, accounts, token) {
     it(`should let ${utils.formatAccount(accounts[1])} ` +
       `send 3 ${token.symbol} with empty data ` +
       `to ${utils.formatAccount(accounts[2])}`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -28,14 +29,16 @@ exports.test = function(web3, accounts, token) {
             to: accounts[2],
             amount: web3.utils.toWei('3'),
             data: null,
-            operatorData: null
-        }}, {
+            operatorData: null,
+          },
+        }, {
           name: 'Transfer',
           data: {
             from: accounts[1],
             to: accounts[2],
             amount: web3.utils.toWei('3'),
-        }}]
+          },
+        }]
       );
 
       await token.contract.methods
@@ -43,7 +46,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[1] });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 7);
       await utils.assertBalance(web3, token, accounts[2], 13);
       await eventsCalled;
@@ -52,7 +56,8 @@ exports.test = function(web3, accounts, token) {
     it(`should let ${utils.formatAccount(accounts[1])} ` +
       `send 3 ${token.symbol} with data ` +
       `to ${utils.formatAccount(accounts[2])}`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -65,14 +70,16 @@ exports.test = function(web3, accounts, token) {
             to: accounts[2],
             amount: web3.utils.toWei('3'),
             data: '0xcafe',
-            operatorData: null
-        }}, {
+            operatorData: null,
+          },
+        }, {
           name: 'Transfer',
           data: {
             from: accounts[1],
             to: accounts[2],
             amount: web3.utils.toWei('3'),
-        }}]
+          },
+        }]
       );
 
       await token.contract.methods
@@ -80,7 +87,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[1] });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 7);
       await utils.assertBalance(web3, token, accounts[2], 13);
       await eventsCalled;
@@ -89,7 +97,8 @@ exports.test = function(web3, accounts, token) {
     it(`should let ${utils.formatAccount(accounts[1])} ` +
       `send 3 ${token.symbol} to ${utils.formatAccount(accounts[2])} ` +
       '(ERC20 Disabled)', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -103,8 +112,9 @@ exports.test = function(web3, accounts, token) {
           to: accounts[2],
           amount: web3.utils.toWei('3'),
           data: null,
-          operatorData: null
-      });
+          operatorData: null,
+        }
+      );
 
       await token.contract.methods
         .send(accounts[2], web3.utils.toWei('3'), '0x')
@@ -112,7 +122,8 @@ exports.test = function(web3, accounts, token) {
 
       await utils.getBlock(web3);
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 7);
       await utils.assertBalance(web3, token, accounts[2], 13);
       await eventCalled;
@@ -120,7 +131,8 @@ exports.test = function(web3, accounts, token) {
 
     it(`should not let ${utils.formatAccount(accounts[1])} ` +
       `send 11 ${token.symbol} (not enough funds)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -130,14 +142,16 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should not let ${utils.formatAccount(accounts[1])} ` +
       `send -3 ${token.symbol} (negative amount)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -147,14 +161,16 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should not let ${utils.formatAccount(accounts[1])} ` +
       `send 0.007 ${token.symbol} (< granulairty)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -164,14 +180,16 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should not let ${utils.formatAccount(accounts[1])} ` +
       `send ${token.symbol} to 0x0 (zero-account)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -182,7 +200,8 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });

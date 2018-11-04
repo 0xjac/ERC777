@@ -15,7 +15,6 @@ exports.test = function(web3, accounts, token) {
     it(`should let ${utils.formatAccount(accounts[3])} ` +
       `send 1.12 ${token.symbol} from ${utils.formatAccount(accounts[1])} ` +
       `to ${utils.formatAccount(accounts[2])}`, async function() {
-
       let eventsCalled = utils.assertEventsWillBeCalled(
         token.contract, [{
           name: 'AuthorizedOperator',
@@ -28,21 +27,24 @@ exports.test = function(web3, accounts, token) {
             to: accounts[2],
             amount: web3.utils.toWei('1.12'),
             data: null,
-            operatorData: null
-        }}, {
+            operatorData: null,
+          },
+        }, {
           name: 'Transfer',
           data: {
             from: accounts[1],
             to: accounts[2],
             amount: web3.utils.toWei('1.12'),
-        }}]
+          },
+        }]
       );
 
       await token.contract.methods
         .authorizeOperator(accounts[3])
         .send({ from: accounts[1], gas: 300000 });
 
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -52,7 +54,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[3] });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 8.88);
       await utils.assertBalance(web3, token, accounts[2], 11.12);
       await eventsCalled;
@@ -60,7 +63,8 @@ exports.test = function(web3, accounts, token) {
 
     it(`should not let ${utils.formatAccount(accounts[3])} send from ` +
       `${utils.formatAccount(accounts[1])} (not operator)`, async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -71,14 +75,16 @@ exports.test = function(web3, accounts, token) {
         .should.be.rejectedWith('revert');
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[1], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
     });
 
     it(`should let ${utils.formatAccount(accounts[3])} ` +
       'use operatorSend on itself', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -91,14 +97,16 @@ exports.test = function(web3, accounts, token) {
             to: accounts[2],
             amount: web3.utils.toWei('3.72'),
             data: null,
-            operatorData: null
-        }}, {
+            operatorData: null,
+          },
+        }, {
           name: 'Transfer',
           data: {
             from: accounts[3],
             to: accounts[2],
             amount: web3.utils.toWei('3.72'),
-        }}]
+          },
+        }]
       );
 
       await token.contract.methods
@@ -107,7 +115,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[3] });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 6.28);
       await utils.assertBalance(web3, token, accounts[2], 13.72);
       await eventsCalled;
@@ -115,7 +124,8 @@ exports.test = function(web3, accounts, token) {
 
     it(`should let ${utils.formatAccount(accounts[3])} ` +
       'use operatorSend on itself (ERC20 Disabled)', async function() {
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 10);
       await utils.assertBalance(web3, token, accounts[2], 10);
 
@@ -127,8 +137,9 @@ exports.test = function(web3, accounts, token) {
           to: accounts[2],
           amount: web3.utils.toWei('3.72'),
           data: null,
-          operatorData: null
-      });
+          operatorData: null,
+        }
+      );
 
       await token.contract.methods
         .operatorSend(
@@ -136,7 +147,8 @@ exports.test = function(web3, accounts, token) {
         .send({ gas: 300000, from: accounts[3] });
 
       await utils.getBlock(web3);
-      await utils.assertTotalSupply(web3, token, 10 * accounts.length + token.initialSupply);
+      await utils.assertTotalSupply(
+        web3, token, 10 * accounts.length + token.initialSupply);
       await utils.assertBalance(web3, token, accounts[3], 6.28);
       await utils.assertBalance(web3, token, accounts[2], 13.72);
       await eventCalled;

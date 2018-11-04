@@ -18,14 +18,16 @@ exports.test = function(web3, accounts, token) {
               operator: web3.utils.toChecksumAddress(accounts[0]),
               to: web3.utils.toChecksumAddress(accounts[1]),
               amount: web3.utils.toWei('10'),
-              operatorData: null
-          }}, {
+              operatorData: null,
+            },
+          }, {
             name: 'Transfer',
             data: {
               from: utils.zeroAddress,
               to: web3.utils.toChecksumAddress(accounts[1]),
               amount: web3.utils.toWei('10'),
-          }}]
+            },
+          }]
         );
 
         await token.contract.methods
@@ -45,12 +47,14 @@ exports.test = function(web3, accounts, token) {
       '(ERC20 Disabled)', async function() {
       await utils.assertBalance(web3, token, accounts[1], 0);
 
-      let eventCalled = utils.assertEventWillBeCalled(token.contract, 'Minted', {
-        operator: web3.utils.toChecksumAddress(accounts[0]),
-        to: web3.utils.toChecksumAddress(accounts[1]),
-        amount: web3.utils.toWei('10'),
-        operatorData: null
-      });
+      let eventCalled = utils.assertEventWillBeCalled(
+        token.contract, 'Minted', {
+          operator: web3.utils.toChecksumAddress(accounts[0]),
+          to: web3.utils.toChecksumAddress(accounts[1]),
+          amount: web3.utils.toWei('10'),
+          operatorData: null,
+        }
+      );
 
       await token.disableERC20();
 
