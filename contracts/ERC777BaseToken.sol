@@ -71,8 +71,16 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer {
     /// @notice Send `_amount` of tokens to address `_to` passing `_data` to the recipient
     /// @param _to The address of the recipient
     /// @param _amount The number of tokens to be sent
+    /// @para, _data The data to be sent
     function send(address _to, uint256 _amount, bytes _data) public {
         doSend(msg.sender, msg.sender, _to, _amount, _data, "", true);
+    }
+    
+    /// @notice Send `_amount` of tokens to address `_to` passing `_data` to the recipient
+    /// @param _to The address of the recipient
+    /// @param _amount The number of tokens to be sent
+    function send(address _to, uint256 _amount) public {
+        doSend(msg.sender, msg.sender, _to, _amount, "", "", true);
     }
 
     /// @notice Authorize a third party `_operator` to manage (send) `msg.sender`'s tokens.
