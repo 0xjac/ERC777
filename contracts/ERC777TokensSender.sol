@@ -15,7 +15,7 @@ interface ERC777TokensSender {
         address from,
         address to,
         uint amount,
-        bytes calldata userData,
+        bytes calldata data,
         bytes calldata operatorData
     ) external;
 }
