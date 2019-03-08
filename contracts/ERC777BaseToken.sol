@@ -3,14 +3,14 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 pragma solidity 0.4.24;
 
-import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
+import { ERC1820Client } from "erc1820/contracts/ERC1820Client.sol";
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { ERC777Token } from "./ERC777Token.sol";
 import { ERC777TokensSender } from "./ERC777TokensSender.sol";
 import { ERC777TokensRecipient } from "./ERC777TokensRecipient.sol";
 
 
-contract ERC777BaseToken is ERC777Token, ERC820Implementer {
+contract ERC777BaseToken is ERC777Token, ERC1820Client {
     using SafeMath for uint256;
 
     string internal mName;

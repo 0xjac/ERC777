@@ -9,7 +9,7 @@ const OldExampleTokensRecipient = artifacts.require('ExampleTokensRecipient');
 const empty = '0x';
 
 let deployTokensRecipient;
-let erc820Registry;
+let erc1820Registry;
 
 exports.test = function(web3, accounts, token) {
   describe('TokensRecipient', async function() {
@@ -19,7 +19,7 @@ exports.test = function(web3, accounts, token) {
         { data: OldExampleTokensRecipient.bytecode }
       );
 
-      erc820Registry = utils.getERC820Registry(web3);
+      erc1820Registry = utils.getERC1820Registry(web3);
 
       deployTokensRecipient = async function(setInterface, from) {
         const deployRecipient = ExampleTokensRecipient
@@ -37,11 +37,11 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    // truffle clean-room is not able to revert the ERC820Registry
+    // truffle clean-room is not able to revert the ERC1820Registry
     // manually unset any TokensRecipient that may have been set during testing.
     afterEach(async function() {
       for (let account of accounts) {
-        await erc820Registry.methods
+        await erc1820Registry.methods
           .setInterfaceImplementer(
             account,
             web3.utils.keccak256('ERC777TokensRecipient'),
@@ -193,7 +193,7 @@ exports.test = function(web3, accounts, token) {
       `${utils.formatAccount(accounts[4])} on send`, async function() {
       const recipient = await deployTokensRecipient(false, accounts[4]);
 
-      await erc820Registry.methods
+      await erc1820Registry.methods
         .setInterfaceImplementer(
           accounts[4],
           web3.utils.keccak256('ERC777TokensRecipient'),
@@ -262,7 +262,7 @@ exports.test = function(web3, accounts, token) {
       '(ERC20 Disabled)', async function() {
       const recipient = await deployTokensRecipient(false, accounts[4]);
 
-      await erc820Registry.methods
+      await erc1820Registry.methods
         .setInterfaceImplementer(
           accounts[4],
           web3.utils.keccak256('ERC777TokensRecipient'),
@@ -347,7 +347,7 @@ exports.test = function(web3, accounts, token) {
       `${utils.formatAccount(accounts[4])} on mint`, async function() {
       const recipient = await deployTokensRecipient(false, accounts[4]);
 
-      await erc820Registry.methods
+      await erc1820Registry.methods
         .setInterfaceImplementer(
           accounts[4],
           web3.utils.keccak256('ERC777TokensRecipient'),

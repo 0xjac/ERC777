@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 const chai = require('chai');
 const assert = chai.assert;
-const ERC820Registry = artifacts.require('ERC820Registry');
+const ERC1820 = require('erc1820');
 const testAccounts = [
   '0x093d49D617a10F26915553255Ec3FEE532d2C12F',
   '0x1dc728786E09F862E39Be1f39dD218EE37feB68D',
@@ -68,21 +68,15 @@ module.exports = {
     this.log(`balance[${account}]: ${web3.utils.fromWei(balance)}`);
   },
 
-  getERC820Registry(web3) {
-    return new web3.eth.Contract(
-      ERC820Registry.abi,
-      '0x991a1bcb077599290d7305493c9a630c20f8b798'
-    );
+  getERC1820Registry(web3) {
+    return ERC1820.ERC1820Registry(web3);
   },
 
   async mintForAllAccounts(web3, accounts, token, operator, amount) {
-    let erc820Registry = new web3.eth.Contract(
-      ERC820Registry.abi,
-      '0x991a1bcb077599290d7305493c9a630c20f8b798'
-    );
+    let erc1820Registry = ERC1820.ERC1820Registry(web3);
     let hook;
     for (let account of accounts) {
-      hook = await erc820Registry.methods.getInterfaceImplementer(
+      hook = await erc1820Registry.methods.getInterfaceImplementer(
         account, web3.utils.keccak256('ERC777TokensRecipient')).call();
       if (hook === zeroAddress) { hook = '0x0'; }
       log(`mint ${amount} for ${account} by ${operator} (hook: ${hook})`);

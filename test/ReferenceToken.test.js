@@ -6,7 +6,7 @@ const assert = chai.assert;
 chai.use(require('chai-as-promised')).should();
 const { URL } = require('url');
 const Web3 = require('web3');
-const EIP820Registry = require('eip820');
+const ERC1820 = require('erc1820');
 const OldReferenceToken = artifacts.require('ReferenceToken');
 const utils = require('./utils');
 
@@ -43,8 +43,8 @@ contract('ReferenceToken', function(accounts) {
     ] });
 
   beforeEach(async function() {
-    let erc820Registry = await EIP820Registry.deploy(web3, accounts[0]);
-    assert.ok(erc820Registry.$address);
+    let erc1820Registry = await ERC1820.deploy(web3, accounts[0]);
+    assert.ok(erc1820Registry.options.address);
 
     // Use Web3.js 1.0
     const estimateGas = await deployContract.estimateGas();
@@ -98,9 +98,9 @@ contract('ReferenceToken', function(accounts) {
 
   describe('ERC20 Disable', function() {
     it('should disable ERC20 compatibility', async function() {
-      let erc820Registry = utils.getERC820Registry(web3);
+      let erc1820Registry = utils.getERC1820Registry(web3);
       let erc20Hash = web3.utils.keccak256('ERC20Token');
-      let erc20Addr = await erc820Registry.methods
+      let erc20Addr = await erc1820Registry.methods
         .getInterfaceImplementer(token.contract.options.address, erc20Hash)
         .call();
 
@@ -109,7 +109,7 @@ contract('ReferenceToken', function(accounts) {
       await token.disableERC20();
 
       await utils.getBlock(web3);
-      erc20Addr = await erc820Registry.methods
+      erc20Addr = await erc1820Registry.methods
         .getInterfaceImplementer(token.contract.options.address, erc20Hash)
         .call();
 

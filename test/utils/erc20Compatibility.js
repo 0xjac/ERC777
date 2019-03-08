@@ -13,11 +13,11 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    it('should register the "ERC20Token" interface with ERC820',
+    it('should register the "ERC20Token" interface with ERC1820',
       async function() {
-        let erc820Registry = utils.getERC820Registry(web3);
+        let erc1820Registry = utils.getERC1820Registry(web3);
         let erc20Hash = web3.utils.keccak256('ERC20Token');
-        let erc20Addr = await erc820Registry.methods
+        let erc20Addr = await erc1820Registry.methods
           .getInterfaceImplementer(token.contract.options.address, erc20Hash)
           .call();
 

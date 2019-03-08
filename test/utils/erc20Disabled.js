@@ -80,7 +80,7 @@ exports.test = function(web3, accounts, token) {
     });
 
     it('should enable ERC20 compatibility', async function() {
-      let erc820Registry = utils.getERC820Registry(web3);
+      let erc820Registry = utils.getERC1820Registry(web3);
       let erc20Hash = web3.utils.keccak256('ERC20Token');
       let erc20Addr = await erc820Registry.methods
         .getInterfaceImplementer(token.contract.options.address, erc20Hash)

@@ -7,14 +7,14 @@
  */
 pragma solidity 0.4.24;
 
-import { ERC820Implementer } from "eip820/contracts/ERC820Implementer.sol";
-import { ERC820ImplementerInterface } from "eip820/contracts/ERC820ImplementerInterface.sol";
+import { ERC1820Client } from "erc1820/contracts/ERC1820Client.sol";
+import { ERC1820ImplementerInterface } from "erc1820/contracts/ERC1820ImplementerInterface.sol";
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { ERC777TokensSender } from "../ERC777TokensSender.sol";
 import { ERC777Token } from "../ERC777Token.sol";
 
 
-contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, ERC777TokensSender, Ownable {
+contract ExampleTokensSender is ERC1820Client, ERC1820ImplementerInterface, ERC777TokensSender, Ownable {
 
     bool private allowTokensToSend;
 
@@ -59,8 +59,8 @@ contract ExampleTokensSender is ERC820Implementer, ERC820ImplementerInterface, E
     function rejectTokensToSend() public onlyOwner { allowTokensToSend = false; }
 
     // solhint-disable-next-line no-unused-vars
-    function canImplementInterfaceForAddress(address addr, bytes32 interfaceHash) public view returns(bytes32) {
-        return ERC820_ACCEPT_MAGIC;
+    function canImplementInterfaceForAddress(bytes32 _interfaceHash, address _addr) external view  returns(bytes32) {
+        return ERC1820_ACCEPT_MAGIC;
     }
 
 }
