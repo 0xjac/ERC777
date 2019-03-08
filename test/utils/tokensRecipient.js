@@ -370,6 +370,7 @@ exports.test = function(web3, accounts, token) {
             operator: accounts[0],
             to: accounts[4],
             amount: web3.utils.toWei('1.22'),
+            data: '0xcafe',
             operatorData: '0xbeef',
           },
         }, {
@@ -383,7 +384,7 @@ exports.test = function(web3, accounts, token) {
       );
 
       await token.contract.methods
-        .mint(accounts[4], web3.utils.toWei('1.22'), '0xbeef')
+        .mint(accounts[4], web3.utils.toWei('1.22'), '0xcafe', '0xbeef')
         .send({ gas: 300000, from: accounts[0] });
 
       await utils.getBlock(web3);
@@ -395,7 +396,7 @@ exports.test = function(web3, accounts, token) {
         accounts[0],
         utils.zeroAddress,
         accounts[4],
-        null,
+        '0xcafe',
         '0xbeef',
         0,
         11.22,
