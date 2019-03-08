@@ -56,13 +56,13 @@ Then if you are able to, indicate in the issue that you have a fix on the way an
 
 Thanks for your help!
 
-If there is an [open issue](https://github.com/jacquesd/ERC777/issues?q=is%3Aopen+is%3Aissue) not assigned to anyone which you feel you can solve, indicate your interest and once assigned it's yours to fix!
+If there is an [open issue](https://github.com/0xjac/ERC777/issues?q=is%3Aopen+is%3Aissue) not assigned to anyone which you feel you can solve, indicate your interest and once assigned it's yours to fix!
 
 At that point simply provide a [pull request].
 
 >Note: If you have a PR for an open issue which is not assigned to you, feel free to submit it too. But please understand that someone else may already be working on a fix and your PR may be refused.
 
-[devel]: https://github.com/jacquesd/ERC777/commits/devel
-[pull request]: https://github.com/jacquesd/ERC777/pulls
-[issue]: https://github.com/jacquesd/ERC777/issues
+[devel]: https://github.com/0xjac/ERC777/commits/devel
+[pull request]: https://github.com/0xjac/ERC777/pulls
+[issue]: https://github.com/0xjac/ERC777/issues
 [good commit messages]: https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
