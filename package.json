@@ -54,7 +54,7 @@
   },
   "homepage": "https://github.com/0xjac/ERC777#readme",
   "dependencies": {
-    "eip820": "0.0.20",
+    "erc1820": "0.0.2",
     "openzeppelin-solidity": "1.9.0"
   },
   "devDependencies": {

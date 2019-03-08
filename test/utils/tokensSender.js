@@ -8,7 +8,7 @@ const utils = require('./index');
 const OldExampleTokensSender = artifacts.require('ExampleTokensSender');
 
 let deployTokensSender;
-let erc820Registry;
+let erc1820Registry;
 
 exports.test = function(web3, accounts, token) {
   describe('TokensSender', async function() {
@@ -18,7 +18,7 @@ exports.test = function(web3, accounts, token) {
         { data: OldExampleTokensSender.bytecode }
       );
 
-      erc820Registry = utils.getERC820Registry(web3);
+      erc1820Registry = utils.getERC1820Registry(web3);
 
       deployTokensSender = async function(setInterface, from) {
         const deploySender = ExampleTokensSender
@@ -28,7 +28,7 @@ exports.test = function(web3, accounts, token) {
           .send({ from: from, gas: deployGas });
         assert.ok(sender.options.address);
 
-        await erc820Registry.methods
+        await erc1820Registry.methods
           .setInterfaceImplementer(
             from,
             web3.utils.keccak256('ERC777TokensSender'),
@@ -44,11 +44,11 @@ exports.test = function(web3, accounts, token) {
         .mintForAllAccounts(web3, accounts, token, accounts[0], '10', 100000);
     });
 
-    // truffle clean-room is not able to revert the ERC820Registry
+    // truffle clean-room is not able to revert the ERC1820Registry
     // manually unset any TokensSenders that may have been set during testing.
     afterEach(async function() {
       for (let account of accounts) {
-        await erc820Registry.methods
+        await erc1820Registry.methods
           .setInterfaceImplementer(
             account,
             web3.utils.keccak256('ERC777TokensSender'),
