@@ -5,7 +5,7 @@
 * This code has not been reviewed.
 * Do not use or deploy this code before reviewing it personally first.
 */
-pragma solidity 0.4.24;
+pragma solidity 0.5.3;
 
 
 contract Migrations {
@@ -16,7 +16,7 @@ contract Migrations {
         if (msg.sender == owner) _;
     }
 
-    function Migrations() public {
+    constructor() public {
         owner = msg.sender;
     }
 

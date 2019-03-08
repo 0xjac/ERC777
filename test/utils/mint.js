@@ -31,7 +31,7 @@ exports.test = function(web3, accounts, token) {
         );
 
         await token.contract.methods
-          .mint(accounts[1], web3.utils.toWei('10'), '0x')
+          .mint(accounts[1], web3.utils.toWei('10'), '0x', '0x')
           .send({ gas: 300000, from: accounts[0] });
 
         await utils.getBlock(web3);
@@ -59,7 +59,7 @@ exports.test = function(web3, accounts, token) {
       await token.disableERC20();
 
       await token.contract.methods
-        .mint(accounts[1], web3.utils.toWei('10'), '0x')
+        .mint(accounts[1], web3.utils.toWei('10'), '0x', '0x')
         .send({ gas: 300000, from: accounts[0] });
 
       await utils.getBlock(web3);
@@ -74,7 +74,7 @@ exports.test = function(web3, accounts, token) {
         await utils.assertBalance(web3, token, accounts[1], 0);
 
         await token.contract.methods
-          .mint(accounts[1], web3.utils.toWei('-10'), '0x')
+          .mint(accounts[1], web3.utils.toWei('-10'), '0x', '0x')
           .send({ gas: 300000, from: accounts[0] })
           .should.be.rejectedWith('revert');
 
@@ -90,7 +90,7 @@ exports.test = function(web3, accounts, token) {
         await utils.assertBalance(web3, token, accounts[1], 0);
 
         await token.contract.methods
-          .mint(accounts[1], web3.utils.toWei('0.007'), '0x')
+          .mint(accounts[1], web3.utils.toWei('0.007'), '0x', '0x')
           .send({ gas: 300000, from: accounts[0] })
           .should.be.rejectedWith('revert');
 

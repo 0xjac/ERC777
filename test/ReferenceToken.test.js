@@ -60,7 +60,7 @@ contract('ReferenceToken', function(accounts) {
 
     token.mintForAccount = async function(account, amount, operator) {
       const mintTx = token.contract.methods
-        .mint(account, web3.utils.toWei(amount), '0xcafe');
+        .mint(account, web3.utils.toWei(amount), '0xbeef', '0xcafe');
       const gas = await mintTx.estimateGas();
       await mintTx.send({ gas: gas, from: operator });
     };

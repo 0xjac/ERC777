@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-pragma solidity 0.4.24;
+pragma solidity 0.5.3;
 
 /// @title ERC777 ReferenceToken Contract
 /// @author Jordi Baylina, Jacques Dafflon
@@ -24,24 +24,24 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     address private mBurnOperator;
 
     constructor(
-        string _name,
-        string _symbol,
+        string memory _name,
+        string memory _symbol,
         uint256 _granularity,
-        address[] _defaultOperators,
+        address[] memory _defaultOperators,
         address _burnOperator,
         uint256 _initialSupply
     )
         public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators)
     {
         mBurnOperator = _burnOperator;
-        doMint(msg.sender, _initialSupply, "");
+        doMint(msg.sender, _initialSupply, "", "");
     }
 
     /// @notice Disables the ERC20 interface. This function can only be called
     ///  by the owner.
     function disableERC20() public onlyOwner {
         mErc20compatible = false;
-        setInterfaceImplementation("ERC20Token", 0x0);
+        setInterfaceImplementation("ERC20Token", address(0));
         emit ERC20Disabled();
     }
 
@@ -49,7 +49,7 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     ///  by the owner.
     function enableERC20() public onlyOwner {
         mErc20compatible = true;
-        setInterfaceImplementation("ERC20Token", this);
+        setInterfaceImplementation("ERC20Token", address(this));
         emit ERC20Enabled();
     }
 
@@ -60,8 +60,15 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     /// @param _tokenHolder The address that will be assigned the new tokens
     /// @param _amount The quantity of tokens generated
     /// @param _operatorData Data that will be passed to the recipient as a first transfer
-    function mint(address _tokenHolder, uint256 _amount, bytes _operatorData) public onlyOwner {
-        doMint(_tokenHolder, _amount, _operatorData);
+    function mint(
+        address _tokenHolder,
+        uint256 _amount,
+        bytes calldata _data,
+        bytes calldata _operatorData
+    )
+        external onlyOwner
+    {
+        doMint(_tokenHolder, _amount, _data, _operatorData);
     }
 
     /// @notice Burns `_amount` tokens from `msg.sender`
@@ -69,8 +76,8 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     ///  Do not forget to override the `burn` function in your token contract if you want to prevent users from
     ///  burning their tokens.
     /// @param _amount The quantity of tokens to burn
-    function burn(uint256 _amount, bytes _data) public onlyOwner {
-        super.burn(_amount, _data);
+    function burn(uint256 _amount, bytes calldata _data) external onlyOwner {
+        doBurn(msg.sender, msg.sender, _amount, _data, "");
     }
 
     /// @notice Burns `_amount` tokens from `_tokenHolder` by `_operator`
@@ -79,19 +86,27 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     ///  burning their tokens.
     /// @param _tokenHolder The address that will lose the tokens
     /// @param _amount The quantity of tokens to burn
-    function operatorBurn(address _tokenHolder, uint256 _amount, bytes _data, bytes _operatorData) public {
+    function operatorBurn(
+        address _tokenHolder,
+        uint256 _amount,
+        bytes calldata _data,
+        bytes calldata _operatorData
+    )
+        external
+    {
         require(msg.sender == mBurnOperator, "Not a burn operator");
-        super.operatorBurn(_tokenHolder, _amount, _data, _operatorData);
+        require(isOperatorFor(msg.sender, _tokenHolder), "Not an operator");
+        doBurn(msg.sender, _tokenHolder, _amount, _data, _operatorData);
     }
 
-    function doMint(address _tokenHolder, uint256 _amount, bytes _operatorData) private {
+    function doMint(address _tokenHolder, uint256 _amount, bytes memory _data, bytes memory _operatorData) private {
         requireMultiple(_amount);
         mTotalSupply = mTotalSupply.add(_amount);
         mBalances[_tokenHolder] = mBalances[_tokenHolder].add(_amount);
 
-        callRecipient(msg.sender, 0x0, _tokenHolder, _amount, "", _operatorData, true);
+        callRecipient(msg.sender, address(0), _tokenHolder, _amount, _data, _operatorData, true);
 
-        emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
-        if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
+        emit Minted(msg.sender, _tokenHolder, _amount, _data, _operatorData);
+        if (mErc20compatible) { emit Transfer(address(0), _tokenHolder, _amount); }
     }
 }
