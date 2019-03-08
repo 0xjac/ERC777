@@ -5,7 +5,7 @@
  * This code has not been reviewed.
  * Do not use or deploy this code before reviewing it personally first.
  */
-pragma solidity 0.4.24;
+pragma solidity 0.5.3;
 
 import { ERC1820Client } from "erc1820/contracts/ERC1820Client.sol";
 import { ERC1820ImplementerInterface } from "erc1820/contracts/ERC1820ImplementerInterface.sol";
@@ -28,7 +28,7 @@ contract ExampleTokensSender is ERC1820Client, ERC1820ImplementerInterface, ERC7
     mapping(address => uint256) public balanceOf;
 
     constructor(bool _setInterface) public {
-        if (_setInterface) { setInterfaceImplementation("ERC777TokensSender", this); }
+        if (_setInterface) { setInterfaceImplementation("ERC777TokensSender", address(this)); }
         allowTokensToSend = true;
     }
 
@@ -37,10 +37,10 @@ contract ExampleTokensSender is ERC1820Client, ERC1820ImplementerInterface, ERC7
         address _from,
         address _to,
         uint _amount,
-        bytes _data,
-        bytes _operatorData
+        bytes calldata _data,
+        bytes calldata _operatorData
     )
-        public
+        external
     {
         require(allowTokensToSend, "Send not allowed");
         token[_to] = msg.sender;

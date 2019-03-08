@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-pragma solidity 0.4.24;
+pragma solidity 0.5.3;
 
 
 import { ERC20Token } from "./ERC20Token.sol";
@@ -14,15 +14,15 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
     mapping(address => mapping(address => uint256)) internal mAllowed;
 
     constructor(
-        string _name,
-        string _symbol,
+        string memory _name,
+        string memory _symbol,
         uint256 _granularity,
-        address[] _defaultOperators
+        address[] memory _defaultOperators
     )
         internal ERC777BaseToken(_name, _symbol, _granularity, _defaultOperators)
     {
         mErc20compatible = true;
-        setInterfaceImplementation("ERC20Token", this);
+        setInterfaceImplementation("ERC20Token", address(this));
     }
 
     /// @notice This modifier is applied to erc20 obsolete methods that are
@@ -86,8 +86,8 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
         address _from,
         address _to,
         uint256 _amount,
-        bytes _data,
-        bytes _operatorData,
+        bytes memory _data,
+        bytes memory _operatorData,
         bool _preventLocking
     )
         internal
@@ -96,10 +96,16 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
         if (mErc20compatible) { emit Transfer(_from, _to, _amount); }
     }
 
-    function doBurn(address _operator, address _tokenHolder, uint256 _amount, bytes _data, bytes _operatorData)
+    function doBurn(
+        address _operator,
+        address _tokenHolder,
+        uint256 _amount,
+        bytes memory _data,
+        bytes memory _operatorData
+    )
         internal
     {
         super.doBurn(_operator, _tokenHolder, _amount, _data, _operatorData);
-        if (mErc20compatible) { emit Transfer(_tokenHolder, 0x0, _amount); }
+        if (mErc20compatible) { emit Transfer(_tokenHolder, address(0), _amount); }
     }
 }
