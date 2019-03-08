@@ -15,11 +15,11 @@
     "test": "test"
   },
   "scripts": {
-    "lint:sol": "npx solium --reporter pretty --dir contracts",
-    "lint:js": "npx eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
+    "lint:sol": "solium --reporter pretty --dir contracts",
+    "lint:js": "eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
     "lint": "npm run lint:sol && npm run lint:js",
-    "build:sol": "npx truffle compile",
-    "build": "npm run clean && npx truffle compile --all",
+    "build:sol": "truffle compile",
+    "build": "npm run clean && truffle compile --all",
     "test": "scripts/test.sh --network 'test'",
     "coverage": "SOLIDITY_COVERAGE=true scripts/test.sh",
     "check": "npm run lint && npm run build && npm run test",
