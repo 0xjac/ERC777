@@ -16,12 +16,13 @@
   },
   "scripts": {
     "lint:sol": "solium --reporter pretty --dir contracts",
-    "lint:js": "eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test migrations truffle-config.js",
+    "lint:js": "eslint --max-warnings 0 --format eslint-formatter-stylish-verbose test",
     "lint": "npm run lint:sol && npm run lint:js",
-    "build:sol": "truffle compile",
-    "build": "npm run clean && truffle compile --all",
-    "test": "scripts/test.sh --network 'test'",
-    "coverage": "SOLIDITY_COVERAGE=true scripts/test.sh",
+    "build:sol": "solc 'erc1820=node_modules/erc1820' 'openzeppelin-solidity=node_modules/openzeppelin-solidity' --allow-paths=',$(pwd)/node_modules' --overwrite --optimize --optimize-runs 200 --metadata-literal --output-dir ./artifacts --combined-json abi,asm,bin,devdoc,hashes,interface,metadata,opcodes,srcmap,userdoc ./contracts/**/*.sol",
+    "build": "npm run clean && npm run build:sol",
+    "test": "mocha",
+    "test-old": "scripts/test.sh --network 'test-old'",
+    "coverage": "echo 'Coverage not supported with Solidity v0.5' && exit 1",
     "check": "npm run lint && npm run build && npm run test",
     "clean": "rm -rf ./build ./coverage ./coverage.json"
   },

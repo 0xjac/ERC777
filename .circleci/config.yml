@@ -1,92 +1,125 @@
-aliases:
-  - &update-npm
-    name: Update npm to the latest version
-    command: sudo npm install -g npm@latest
+version: 2.1
 
-  - &save-dependencies-cache
-    key: v1-dependency-cache-{{ checksum "package.json" }}
-    paths:
-      - ./node_modules
+executors:
+  node:
+    docker:
+      - image: circleci/node:11.10.0
+    working_directory: ~/ERC777
 
-  - &restore-dependencies-cache
-    keys:
-      - v1-dependency-cache-{{ checksum "package.json" }}
-      - v1-dependency-cache-
+commands:
+  restore-dependencies:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-dependency-cache-{{ checksum "package.json" }}
+            - v1-dependency-cache-
 
-  - &save-build-cache
-    key: v1-build-cache-{{ .BuildNum }}
-    paths:
-      - ./build
+  restore-build:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-build-cache-{{ .BuildNum }}
+            - v1-build-cache-
 
-  - &restore-build-cache
-    keys:
-      - v1-build-cache-{{ .BuildNum }}
-      - v1-build-cache-
-  - &filter-all-tags
-    tags:
-      only: /.*/
-
-defaults: &defaults
-  docker:
-    - image: circleci/node:10.6.0
-  working_directory: ~/erc777
-
-version: 2
+  restore-solc:
+    steps:
+      - run:
+          name: Set write permissions
+          command: sudo chmod go+w /opt
+      - restore_cache:
+          keys:
+            - v1-solc-cache-{{ .BuildNum }}
+            - v1-solc-cache-
+      - run:
+          name: Update $PATH
+          command: echo 'export PATH="/opt:$PATH"' >> $BASH_ENV
 
 jobs:
-  install-dependencies:
-    <<: *defaults
+  install solc:
+    executor: node
     steps:
-      - run: *update-npm
+      - run:
+          name: Download solc
+          command: curl -L "https://github.com/ethereum/solidity/releases/download/v0.5.3/solc-static-linux" -o /tmp/solc
+      - run:
+          name: Verify solc download
+          command: echo "be08eb95cb3a1da52e918cf51a0c0397fbe7f0693145eb31835bf2924209f1e0 /tmp/solc" | sha256sum -c -
+      - run:
+          name: Make solc executable
+          command: chmod +x /tmp/solc
+      - run:
+          name: Install solc
+          command: sudo mv /tmp/solc /opt/solc
+      - save_cache:
+          key: v1-solc-cache-{{ .BuildNum }}
+          paths:
+            - /opt/solc
+      - run:
+          name: Solc version
+          command: /opt/solc --version
+
+  install dependencies:
+    executor: node
+    steps:
       - checkout
       - run:
           name: Install npm dependencies with npm ci
           command: npm ci
-      - save_cache: *save-dependencies-cache
+      - save_cache:
+          key: v1-dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+
   build:
-    <<: *defaults
+    executor: node
     steps:
-      - run: *update-npm
       - checkout
-      - restore_cache: *restore-dependencies-cache
+      - restore-solc
+      - restore-dependencies
       - run:
           name: Build Solidity
           command: npm run build
-      - save_cache: *save-build-cache
-  lint-solidity:
-    <<: *defaults
+      - save_cache:
+          key: v1-build-cache-{{ .BuildNum }}
+          paths:
+            - ./artifacts
+
+  lint solidity:
+    executor: node
     steps:
       - checkout
-      - restore_cache: *restore-dependencies-cache
+      - restore-dependencies
       - run:
           name: Lint Solidity
           command: npm run lint:sol
-  lint-javascript:
-    <<: *defaults
+
+  lint javascript:
+    executor: node
     steps:
-      - run: *update-npm
       - checkout
-      - restore_cache: *restore-dependencies-cache
+      - restore-dependencies
       - run:
-          name: Lint Javascript
+          name: Lint JavaScript
           command: npm run lint:js
+
   test:
-    <<: *defaults
+    executor: node
     steps:
-      - run: *update-npm
       - checkout
-      - restore_cache: *restore-dependencies-cache
-      - restore_cache: *restore-build-cache
+      - restore-dependencies
+      - restore-build
+      - restore-solc
       - run:
           name: Test
           command: npm run test
+
   coverage:
-    <<: *defaults
+    executor: node
     steps:
-      - run: *update-npm
       - checkout
-      - restore_cache: *restore-dependencies-cache
-      - restore_cache: *restore-build-cache
+      - restore-dependencies
+      - restore-build
+      - restore-solc
       - run:
           name: Tests with coverage
           command: npm run coverage
@@ -99,13 +132,17 @@ jobs:
       - run:
           name: Enforce minimum coverage threshold
           command: npx istanbul check-coverage --statements 95 --functions 95 --branches 95 --lines 95
+
   publish:
-    <<: *defaults
+    executor: node
     steps:
-      - run: *update-npm
       - checkout
-      - restore_cache: *restore-dependencies-cache
-      - restore_cache: *restore-build-cache
+      - run:
+          name: Verify branch & version tag
+          command: .circleci/deploy-check.sh
+      - restore-dependencies
+      - restore-build
+      - restore-solc
       - run:
           name: Set npm auth token
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -117,37 +154,31 @@ workflows:
   version: 2
   ci_cd:
     jobs:
-      - install-dependencies:
-          filters: *filter-all-tags
+      - install solc
+      - install dependencies
       - build:
           requires:
-            - install-dependencies
-          filters: *filter-all-tags
-      - lint-solidity:
+            - install solc
+            - install dependencies
+      - lint solidity:
           requires:
-            - install-dependencies
-          filters: *filter-all-tags
-      - lint-javascript:
+            - install dependencies
+      - lint javascript:
           requires:
-            - install-dependencies
-          filters: *filter-all-tags
+            - install dependencies
       - test:
           requires:
+            - lint solidity
+            - lint javascript
             - build
-          filters: *filter-all-tags
       - coverage:
           requires:
+            - lint solidity
+            - lint javascript
             - build
-          filters: *filter-all-tags
       - publish:
           requires:
-            - build
             - test
-            - coverage
-            - lint-solidity
-            - lint-javascript
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: master
