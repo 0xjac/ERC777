@@ -22,7 +22,7 @@
     "build": "npm run clean && npm run build:sol",
     "test": "mocha",
     "test-old": "scripts/test.sh --network 'test-old'",
-    "coverage": "SOLIDITY_COVERAGE=true scripts/test.sh",
+    "coverage": "echo 'Coverage not supported with Solidity v0.5' && exit 1",
     "check": "npm run lint && npm run build && npm run test",
     "clean": "rm -rf ./build ./coverage ./coverage.json"
   },
