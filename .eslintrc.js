@@ -50,7 +50,7 @@ module.exports = {
     "no-debugger": 0,
     "no-undef": "error",
     "object-curly-spacing": ["error", "always"],
-    "max-len": ["error", 80, 2],
+    "max-len": ["error", 120, 2],
     "generator-star-spacing": ["error", "before"],
     "promise/avoid-new": 0,
     "promise/always-return": 0

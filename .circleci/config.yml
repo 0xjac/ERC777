@@ -16,7 +16,7 @@ aliases:
   - &save-build-cache
     key: v1-build-cache-{{ .BuildNum }}
     paths:
-      - ./build
+      - ./artifacts
 
   - &restore-build-cache
     keys:

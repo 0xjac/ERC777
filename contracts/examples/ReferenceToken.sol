@@ -21,19 +21,17 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
     event ERC20Enabled();
     event ERC20Disabled();
 
-    address private mBurnOperator;
+    mapping(address => bool) private mBurnOperators;
 
     constructor(
         string memory _name,
         string memory _symbol,
         uint256 _granularity,
         address[] memory _defaultOperators,
-        address _burnOperator,
         uint256 _initialSupply
     )
         public ERC777ERC20BaseToken(_name, _symbol, _granularity, _defaultOperators)
     {
-        mBurnOperator = _burnOperator;
         doMint(msg.sender, _initialSupply, "", "");
     }
 
@@ -53,22 +51,12 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         emit ERC20Enabled();
     }
 
-    /* -- Mint And Burn Functions (not part of the ERC777 standard, only the Events/tokensReceived call are) -- */
-    //
-    /// @notice Generates `_amount` tokens to be assigned to `_tokenHolder`
-    ///  Sample mint function to showcase the use of the `Minted` event and the logic to notify the recipient.
-    /// @param _tokenHolder The address that will be assigned the new tokens
-    /// @param _amount The quantity of tokens generated
-    /// @param _operatorData Data that will be passed to the recipient as a first transfer
-    function mint(
-        address _tokenHolder,
-        uint256 _amount,
-        bytes calldata _data,
-        bytes calldata _operatorData
-    )
-        external onlyOwner
-    {
-        doMint(_tokenHolder, _amount, _data, _operatorData);
+    function allowBurn(address burnOperator) external onlyOwner {
+        mBurnOperators[burnOperator] = true;
+    }
+
+    function revokeBurn(address burnOperator) external onlyOwner {
+        mBurnOperators[burnOperator] = true;
     }
 
     /// @notice Burns `_amount` tokens from `msg.sender`
@@ -92,11 +80,29 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         bytes calldata _data,
         bytes calldata _operatorData
     )
-        external
+    external
     {
-        require(msg.sender == mBurnOperator, "Not a burn operator");
+        require(mBurnOperators[msg.sender], "Not a burn operator");
         require(isOperatorFor(msg.sender, _tokenHolder), "Not an operator");
         doBurn(msg.sender, _tokenHolder, _amount, _data, _operatorData);
+    }
+
+    /* -- Mint Function (not part of the ERC777 standard, only the Events/tokensReceived call are) -- */
+    //
+    /// @notice Generates `_amount` tokens to be assigned to `_tokenHolder`
+    ///  Sample mint function to showcase the use of the `Minted` event and the logic to notify the recipient.
+    /// @param _tokenHolder The address that will be assigned the new tokens
+    /// @param _amount The quantity of tokens generated
+    /// @param _operatorData Data that will be passed to the recipient as a first transfer
+    function mint(
+        address _tokenHolder,
+        uint256 _amount,
+        bytes calldata _data,
+        bytes calldata _operatorData
+    )
+        external onlyOwner
+    {
+        doMint(_tokenHolder, _amount, _data, _operatorData);
     }
 
     function doMint(address _tokenHolder, uint256 _amount, bytes memory _data, bytes memory _operatorData) private {
